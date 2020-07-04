@@ -1,8 +1,8 @@
-=========================
-Universal Database Client
-=========================
+=======================================
+Using Selenium to Web Scrape wyzant.com  
+=======================================
 
-:SUMMARY: Use Selenium to watch for new online jobs on Wyzant.com.
+:SUMMARY: Use Selenium to watch for new online jobs on wyzant.com.
 
 :REPOSITORY: https://github.com/DavidJLambert/Selenium
 
