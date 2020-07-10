@@ -10,7 +10,7 @@ VERSION: 0.1.0
 
 DATE: Jul 3, 2020
 """
-from MyConstants import TIMEOUT, BY_ID, BY_PAGE_TITLE
+from MyConstants import *
 from MyFunctions import print_stacktrace
 
 from time import sleep
@@ -82,9 +82,7 @@ class MySelenium(object):
             sleep(sleep_time)  # Seconds.
 
         # Wait for expected page title.
-        # TODO 1 & 2
         self.wait_for_refresh(method, identifier)
-
     # End of method click_sleep_wait.
 
     def website_login(self, username: str, password: str, login_page_url: str,
@@ -108,7 +106,6 @@ class MySelenium(object):
         self.driver.get(login_page_url)
 
         # Wait for login page to appear.
-        # TODO 2
         self.wait_for_refresh(BY_PAGE_TITLE, pre_login_page_title)
 
         # Enter login into login field.
@@ -118,7 +115,6 @@ class MySelenium(object):
         self.driver.find_element_by_xpath(password_field_xpath).send_keys(password)
 
         # Click login button, wait for My Profile page to appear.
-        # TODO 2
         self.click_sleep_wait(login_button_xpath, 0, BY_PAGE_TITLE, post_login_page_title)
     # End of method website_login.
 
@@ -139,7 +135,6 @@ class MySelenium(object):
         self.driver.get(web_page_url)
 
         # Wait for page title to appear.
-        # TODO 3
         self.wait_for_refresh(method, identifier)
     # End of method go_to_web_page.
 

@@ -24,7 +24,6 @@ JOB_STUDENT_NAME = "Student Name"
 JOB_TOPIC = "Topic"
 JOB_PAY_RATE = "Rate"
 JOB_DESCRIPTION = "Job Description"
-JOB_OTHER = "Other"
 CARD_NUM = "Card Number"
 
 SMTP_SERVER = "smtp-mail.outlook.com"

@@ -1,10 +1,12 @@
 from unittest import TestCase
-from MyConstants import JOB_LOCATIONS
 from MyFunctions import *
 import pytest
 
+
 from test.job_dict import jobs
 from test.job_dict_prev import jobs_prev
+
+# TODO for wyzant.py, not wyzant.new.py.
 
 
 class Test(TestCase):

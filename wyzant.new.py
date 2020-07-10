@@ -14,10 +14,9 @@ from copy import deepcopy
 from Check_Chromedriver import Check_Chromedriver
 from winsound import Beep
 from datetime import datetime
-from MyFunctions import *
+from MyFunctionsnew import *
 from MySelenium import *
-
-# ##### GLOBAL VARIABLES #####
+from Jobs import *
 
 # Ignore in-person jobs?
 do_in_person = False
@@ -34,19 +33,17 @@ if get_test_data:
 jobs = dict()
 jobs_prev = dict()
 
-# Initialize jobs and jobs_prev.
-for job_location in JOB_LOCATIONS:
-    jobs[job_location] = dict()
-    jobs_prev[job_location] = dict()
+for job_loc in JOB_LOCATIONS:
+    jobs[job_loc] = Jobs()
+    jobs_prev[job_loc] = Jobs()
 
 # Jobs urls dicts, stores jobs urls.
 job_ids = dict()
 job_ids_prev = dict()
 
-# Initialize job_ids and job_ids_prev.
-for job_location in JOB_LOCATIONS:
-    job_ids[job_location] = set()
-    job_ids_prev[job_location] = set()
+for job_loc in JOB_LOCATIONS:
+    job_ids[job_loc] = JobIDs()
+    job_ids_prev[job_loc] = JobIDs()
 
 # ##### FUNCTION DEFINITIONS #####
 
@@ -59,15 +56,13 @@ def process_academy_cards(my_job_loc: str) -> None:
         my_job_loc (str): Type of job listing (online or in-person).
     Returns:
     """
-    import re
-
     # Clear jobs, job_ids.
-    jobs[my_job_loc] = dict()
-    job_ids[my_job_loc] = set()
+    jobs[my_job_loc].reset()
+    job_ids[my_job_loc].reset()
 
     xpath = job_loc2xpath(my_job_loc)
     my_selenium.click_sleep_wait(xpath, SLEEP_TIME, BY_ID, JOBS_LIST)
-    print("Fetched Wyzant %s jobs list." % job_location)
+    print("Fetched Wyzant %s jobs list." % my_job_loc)
 
     # Each instance of class "academy-card" contains 1 job, up to 10 visible.
     academy_cards = my_selenium.get_related_by_class("academy-card")
@@ -80,34 +75,21 @@ def process_academy_cards(my_job_loc: str) -> None:
         job_id = job_url.split("/")[-1]
 
         # Save Job ID to list of current Job IDs.
-        job_ids[my_job_loc].add(job_id)
+        job_ids[my_job_loc].add_job_id(job_id)
 
         # Initialize storage of job information.
-        jobs[my_job_loc][job_id] = dict()
-
-        # Card Number.
-        jobs[my_job_loc][job_id][CARD_NUM] = card_num
+        jobs[my_job_loc].add_job_id(job_id)
 
         # Age of job listing.
-        job_age = card_obj.find_element_by_xpath('./div[1]/span').text.strip()
-        jobs[my_job_loc][job_id][JOB_AGE] = process_job_age(job_age)
-
+        job_age = card_obj.find_element_by_xpath('./div[1]/span').text
         # Student name.
-        jobs[my_job_loc][job_id][JOB_STUDENT_NAME] = card_obj.find_element_by_xpath('./p[1]').text.strip()
-
+        student_name = card_obj.find_element_by_xpath('./p[1]').text
         # Job topic.
-        jobs[my_job_loc][job_id][JOB_TOPIC] = card_obj.find_element_by_xpath('./h3/a').text.strip()
-
+        job_topic = card_obj.find_element_by_xpath('./h3/a').text
         # Job's suggested pay rate.
         pay_rate = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text
-        jobs[my_job_loc][job_id][JOB_PAY_RATE] = process_pay_rate(pay_rate)
-
         # Job description.
         job_description = card_obj.find_element_by_xpath('./p[2]').text
-        re.sub("(\\r\\n){2,}", "\\r\\n", job_description)
-        re.sub("\\r{2,}", "\\r", job_description)
-        re.sub("\\n{2,}", "\\n", job_description).strip()
-        jobs[my_job_loc][job_id][JOB_DESCRIPTION] = job_description
 
         # Click "Show Details" control to see more job listing info.
         card_obj.find_element_by_xpath('./div[4]/div/div/p').click()
@@ -116,6 +98,7 @@ def process_academy_cards(my_job_loc: str) -> None:
         spc_zeros = card_obj.find_elements_by_class_name("spc-zero")
 
         # Iterate over all job attributes in class "spc_zero".
+        other_params = dict()
         for spc_zero in spc_zeros:
             # There are 1-2 children of class "spc_zero".
             children = spc_zero.find_elements_by_xpath('./child::*')
@@ -129,10 +112,14 @@ def process_academy_cards(my_job_loc: str) -> None:
                 value = "; ".join([item.text for item in items])
 
             # Job attribute in 1st child of class "spc_zero".
-            my_key = spc_zero.find_element_by_xpath('./span[1]').text.strip()
+            my_key = spc_zero.find_element_by_xpath('./span[1]').text
             my_key = my_key.strip().replace(":", "")
-            jobs[my_job_loc][job_id][my_key] = value.strip()
+            other_params[my_key] = value.strip()
 
+        # Add properties of this job_id.
+        jobs[my_job_loc].add_properties(job_id, card_num, job_age, student_name,
+                                        job_topic, pay_rate, job_description,
+                                        **other_params)
         # Done iterating over all job attributes in class "spc_zero".
 
         # Print progress, on just one line.
@@ -194,12 +181,13 @@ if __name__ == '__main__':
             # Save (jobs, job_ids) into (jobs_prev, job_ids_prev).
             # Skip if job_ids empty due to faulty page load.
             for job_loc in JOB_LOCATIONS:
-                if len(job_ids[job_loc]) > 0:
+                if job_ids[job_loc].count() > 0:
                     jobs_prev[job_loc] = deepcopy(jobs[job_loc])
                     job_ids_prev[job_loc] = deepcopy(job_ids[job_loc])
 
             # Fetch jobs.
             for job_loc in JOB_LOCATIONS:
+                # TODO
                 process_academy_cards(job_loc)
 
             # Print and write to log file the current datetime.
@@ -214,9 +202,9 @@ if __name__ == '__main__':
                 # Look for job IDs in job_ids and not in job_ids_prev.
                 # Skip if job_ids or job_ids_prev empty (1st loop or faulty page load).
                 current, previous = job_ids[job_loc], job_ids_prev[job_loc]
-                if len(current) * len(previous) > 0:
+                if current.count() * previous.count() > 0:
                     # Could also restrict myself to jobs with age < 1h.
-                    new_job_ids = get_new_job_ids(current, previous, jobs[job_loc])
+                    new_job_ids = jobs[job_loc].get_new_job_ids(current, previous)
 
                     # Iterate over all new job listings.
                     for job_id in new_job_ids:
@@ -225,7 +213,7 @@ if __name__ == '__main__':
                         job_data = email_subject + "\n"
 
                         # Continue collecting job data.
-                        job_data = get_job_data(job_data, job_id, job_loc, jobs[job_loc])
+                        job_data = jobs[job_loc].get_job_data(job_data, job_id, job_loc)
 
                         # Make audible tone.
                         if do_beep:

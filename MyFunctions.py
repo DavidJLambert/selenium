@@ -10,11 +10,12 @@ VERSION: 0.1.0
 
 DATE: Jul 3, 2020
 """
+import re
 from smtplib import SMTP
 from ssl import create_default_context
 from email.mime.text import MIMEText
 
-from MyConstants import JOB_ONLINE, JOB_IN_PERSON, JOB_OTHER, CARD_NUM
+from MyConstants import *
 from sys import stdout, exc_info
 from traceback import print_exception
 
@@ -84,7 +85,7 @@ def process_job_age(job_age: str) -> int:
     Returns:
         job_age (int): the age of a job listing, in minutes.
     """
-    last_char = job_age[-1]
+    last_char = job_age.strip()[-1]
     if last_char == "m":
         job_age = int(job_age[:-1])
     elif last_char == "h":
@@ -98,7 +99,7 @@ def process_job_age(job_age: str) -> int:
 
 
 def process_pay_rate(pay_rate: str) -> int:
-    """ Process the pay rate  of a job listing.
+    """ Process the pay rate of a job listing.
 
     Parameters:
         pay_rate (str): the pay rate of a job listing.
@@ -116,6 +117,21 @@ def process_pay_rate(pay_rate: str) -> int:
 # End of function process_job_age.
 
 
+def process_job_description(job_description: str) -> str:
+    """ Process the job description of a job listing.
+
+    Parameters:
+        job_description (str): the job_description of a job listing.
+    Returns:
+        job_description (str): the job_description of a job listing.
+    """
+    re.sub("(\\r\\n){2,}", "\\r\\n", job_description.strip())
+    re.sub("\\r{2,}", "\\r", job_description)
+    re.sub("\\n{2,}", "\\n", job_description).strip()
+    return job_description
+# End of function process_job_description.
+
+
 def job_loc2xpath(job_location: str) -> str:
     """ Get the xpath for online and in-person job listings.
 
@@ -131,7 +147,6 @@ def job_loc2xpath(job_location: str) -> str:
         # Look for in-person jobs.
         xpath = "//label[@for='lesson_type_in_person']"
     else:
-        xpath = ""
         raise ValueError("Unknown job location: '%s'." % job_location)
     return xpath
 # End of function job_loc2xpath.
@@ -150,11 +165,15 @@ def nested_print(this_name: str, root_dict: dict) -> None:
             my_key_value = "[%d]" % my_key
         elif isinstance(my_key, str):
             my_key_value = "['%s']" % my_key
+        else:
+            raise NotImplementedError
 
         if isinstance(my_value, int):
             my_value_value = "%d" % my_value
         elif isinstance(my_value, str):
             my_value_value = '"%s"' % my_value.replace('\n', '<LF>').replace('\r', '<CR>')
+        else:
+            raise NotImplementedError
 
         if not isinstance(my_value, dict):
             print("%s%s = %s" % (this_name, my_key_value, my_value_value))
@@ -195,13 +214,8 @@ def get_job_data(job_data: str, job_id: str, job_loc: str, jobs: dict) -> str:
     Returns:
         job_data (str): the job IDs in current, but not in previous.
     """
-    for key2 in jobs[job_id].keys():
-        if key2 != JOB_OTHER:
-            value = jobs[job_id][key2]
-            job_data += "('%s', '%s', '%s'): '%s'\n" % (job_loc, job_id, key2, value)
-        else:
-            for key3 in jobs[job_id][key2].keys():
-                value = jobs[job_id][key2][key3]
-                job_data += "('%s', '%s', '%s', '%s'): '%s'\n" % (job_loc, job_id, key2, key3, value)
+    for key in jobs[job_id].keys():
+        value = jobs[job_id][key]
+        job_data += "('%s', '%s', '%s'): '%s'\n" % (job_loc, job_id, key, value)
     return job_data
 # End of function get_job_data.
