@@ -7,8 +7,6 @@ import pytest
 from test.job_dict import jobs
 from test.job_dict_prev import jobs_prev
 
-# TODO for wyzant.py, not wyzant.py.
-
 
 class Test(TestCase):
     def test_process_job_age(self):
