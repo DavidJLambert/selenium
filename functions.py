@@ -1,4 +1,4 @@
-""" MyFunctionsnew.py
+""" functions.py
 
 SUMMARY: Use Selenium to watch for new online jobs on Wyzant.com.
 
@@ -6,15 +6,15 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.1.0
+VERSION: 0.2.0
 
-DATE: Jul 3, 2020
+DATE: Jul 11, 2020
 """
 from smtplib import SMTP
 from ssl import create_default_context
 from email.mime.text import MIMEText
 
-from MyConstants import *
+from constants import JOB_ONLINE, JOB_IN_PERSON
 from sys import stdout, exc_info
 from traceback import print_exception
 
@@ -56,13 +56,13 @@ def get_boolean(prompt: str) -> bool:
     while True:
         result = input(prompt)[0].upper()
         if result in {"T", "Y", "1"}:
-            print("Entered 'Yes'.")
+            stdout.write("Entered 'Yes'.\n")
             return True
         elif result in {"F", "N", "0"}:
-            print("Entered 'No'.")
+            stdout.write("Entered 'No'.\n")
             return False
         else:
-            print("Invalid choice, try again.")
+            stdout.write("Invalid choice, try again.\n")
 # End of function print_stacktrace.
 
 
@@ -100,9 +100,9 @@ def nested_print(this_name: str, root_dict: dict) -> None:
             raise NotImplementedError
 
         if not isinstance(my_value, dict):
-            print("%s%s = %s" % (this_name, my_key_value, my_value_value))
+            stdout.write("%s%s = %s\n" % (this_name, my_key_value, my_value_value))
         else:
-            print("%s%s = %s" % (this_name, my_key_value, "dict()"))
+            stdout.write("%s%s = %s\n" % (this_name, my_key_value, "dict()"))
             nested_print(this_name+my_key_value, my_value)
     return
 

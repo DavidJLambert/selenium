@@ -6,14 +6,15 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.1.0
+VERSION: 0.2.0
 
-DATE: Jul 3, 2020
+DATE: Jul 11, 2020
 """
-from MyConstants import *
-from MyFunctions import print_stacktrace
+from constants import BY_ID, BY_PAGE_TITLE, TIMEOUT
+from junk.functions import print_stacktrace
 
 from time import sleep
+from sys import stdout
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -78,7 +79,7 @@ class MySelenium(object):
         self.driver.find_element_by_xpath(xpath).click()
 
         if sleep_time > 0:
-            print("Sleeping for %d seconds." % sleep_time)
+            stdout.write("Sleeping for %d seconds.  " % sleep_time)
             sleep(sleep_time)  # Seconds.
 
         # Wait for expected page title.
