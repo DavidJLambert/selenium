@@ -10,8 +10,8 @@ VERSION: 0.2.0
 
 DATE: Jul 11, 2020
 """
-import re
 import constants as c
+import re
 
 
 class Jobs(object):

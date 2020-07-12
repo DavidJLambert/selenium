@@ -10,13 +10,13 @@ VERSION: 0.2.0
 
 DATE: Jul 11, 2020
 """
+from constants import JOB_ONLINE, JOB_IN_PERSON
+
+from sys import stdout, exc_info
+from traceback import print_exception
 from smtplib import SMTP
 from ssl import create_default_context
 from email.mime.text import MIMEText
-
-from constants import JOB_ONLINE, JOB_IN_PERSON
-from sys import stdout, exc_info
-from traceback import print_exception
 
 
 def send_email(smtp_server: str, port: int, password: str, sender: str,

@@ -15,6 +15,7 @@ from functions import print_stacktrace
 
 from time import sleep
 from sys import stdout
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait

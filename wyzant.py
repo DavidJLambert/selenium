@@ -10,6 +10,18 @@ VERSION: 0.2.0
 
 DATE: Jul 11, 2020
 """
+import constants as c
+import functions as f
+from MySelenium import MySelenium
+from Jobs import Jobs
+
+from sys import stdout
+from copy import deepcopy
+from winsound import Beep
+from datetime import datetime
+
+from varname import nameof
+from Check_Chromedriver import Check_Chromedriver
 
 
 def main():
@@ -18,17 +30,6 @@ def main():
     Parameters:
     Returns:
     """
-    import constants as c
-    import functions as f
-    from varname import nameof
-    from sys import stdout
-    from MySelenium import MySelenium
-    from Jobs import Jobs
-    from copy import deepcopy
-    from Check_Chromedriver import Check_Chromedriver
-    from winsound import Beep
-    from datetime import datetime
-
     # Ignore in-person jobs?
     do_in_person = False
     if not do_in_person:
