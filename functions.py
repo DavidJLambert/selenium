@@ -100,7 +100,7 @@ def nested_print(this_name: str, root_dict: dict) -> str:
         elif isinstance(my_value, str):
             my_value_value = '"%s"' % my_value.replace('\n', '<LF>').replace('\r', '<CR>')
         else:
-            my_value_value = "Huh?"
+            my_value_value = "WTF?"
 
         if not isinstance(my_value, dict):
             output += "%s%s = %s\n" % (this_name, my_key_value, my_value_value)
