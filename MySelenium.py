@@ -11,7 +11,7 @@ VERSION: 0.2.0
 DATE: Jul 11, 2020
 """
 from constants import BY_ID, BY_PAGE_TITLE, TIMEOUT
-from junk.functions import print_stacktrace
+from functions import print_stacktrace
 
 from time import sleep
 from sys import stdout

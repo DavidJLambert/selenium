@@ -1,5 +1,5 @@
 from unittest import TestCase
-from junk import functions as f
+import functions as f
 from constants import JOB_LOCATIONS, JOB_ONLINE, JOB_IN_PERSON
 import pytest
 

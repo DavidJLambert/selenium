@@ -41,43 +41,23 @@ class Jobs(object):
         self.job_ids = set()
     # End of method reset.
 
-    def add_job_id(self, new_job_id: str) -> None:
-        """ Add new job_id to jobs.
+    def add_job(self, **params: dict) -> None:
+        """ Add new job to jobs.
 
         Parameters:
-            new_job_id (str): new job_id to add to the collection of job_ids.
+            params (dict): dictionary of parameters to add to job_id.
+        Required elements of params:
+            JOB_ID, CARD_NUMBER, JOB_AGE, STUDENT_NAME, JOB_TOPIC, PAY_RATE, JOB_DESCRIPTION
+        Optional elements of params:
+            "Availability", "Lesson frequency", "Location", "Preferred lesson location",
+            "Student grade level", "Subject", "Timezone", "Tutoring goals", "Would like lessons to begin".
         Returns:
         """
-        self.jobs[new_job_id] = dict()
-        self.job_ids.add(new_job_id)
-    # End of method add_job_id.
+        job_id = params[c.JOB_ID]
+        self.jobs[job_id] = dict()
+        self.job_ids.add(job_id)
 
-    def add_properties(self, job_id: str, card_num: int, job_age: str,
-                       student_name: str, job_topic: str, pay_rate: str,
-                       job_description: str, **other_params: dict) -> None:
-        """ Add properties to jobs for job_id.
-
-        Parameters:
-            job_id (str): job_id to add properties to.
-            card_num (int): card_num to add to job_id.
-            job_age (str): unprocessed job_age to add to job_id.
-            student_name (str): student_name to add to job_id.
-            job_topic (str): job_topic to add to job_id.
-            pay_rate (str): unprocessed pay_rate to add to job_id.
-            job_description (str): unprocessed job_description to add to job_id.
-            other_params (dict): dictionary of parameters to add to job_id.
-        Returns:
-        """
-        self.jobs[job_id][c.CARD_NUM] = card_num
-        job_age = self.process_job_age(job_age)
-        self.jobs[job_id][c.JOB_AGE] = job_age
-        self.jobs[job_id][c.JOB_STUDENT_NAME] = student_name.strip()
-        self.jobs[job_id][c.JOB_TOPIC] = job_topic.strip()
-        pay_rate = self.process_pay_rate(pay_rate)
-        self.jobs[job_id][c.JOB_PAY_RATE] = pay_rate
-        job_description = self.process_job_description(job_description)
-        self.jobs[job_id][c.JOB_DESCRIPTION] = job_description
-        for key, value in other_params.items():
+        for key, value in params.items():
             self.jobs[job_id][key] = value
     # End of method add_properties.
 
@@ -102,11 +82,11 @@ class Jobs(object):
         job_ids_current = self.job_ids
         job_ids_in_both = job_ids_current.intersection(job_ids_prev)
         # Find smallest card_num ("min_cn") for job_id's in job_id_in_both.
-        min_cn = [self.jobs[job_id][c.CARD_NUM] for job_id in job_ids_in_both]
+        min_cn = [self.jobs[job_id][c.CARD_NUMBER] for job_id in job_ids_in_both]
         min_cn = min(min_cn)
         # Find job_id's with card_num's < min_cn.
         new_job_ids = [job_id for job_id in job_ids_current
-                       if self.jobs[job_id][c.CARD_NUM] < min_cn]
+                       if self.jobs[job_id][c.CARD_NUMBER] < min_cn]
         return set(new_job_ids)
     # End of method get_new_job_ids.
 
