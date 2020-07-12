@@ -12,6 +12,7 @@ DATE: Jul 11, 2020
 """
 from constants import JOB_ONLINE, JOB_IN_PERSON
 
+from varname import nameof
 from sys import stdout, exc_info
 from traceback import print_exception
 from smtplib import SMTP
@@ -76,19 +77,21 @@ def print_stacktrace() -> None:
 # End of function print_stacktrace.
 
 
-def nested_print(this_name: str, root_dict: dict) -> None:
-    """ Print the elements of a nested dictionary.
+def nested_print(this_name: str, root_dict: dict) -> str:
+    """ Get printable report of the elements of a nested dictionary.
 
     Parameters:
         this_name (str): nameof(root_dict), where "from varname import nameof".
         root_dict (dict): the dictionary whose elements must be printed.
     Returns:
+        output (str): printable report of the elements of a nested dictionary.
     """
+    output = ""
     for my_key, my_value in root_dict.items():
         if isinstance(my_key, int):
             my_key_value = "[%d]" % my_key
         elif isinstance(my_key, str):
-            my_key_value = "['%s']" % my_key
+            my_key_value = '["%s"]' % my_key
         else:
             raise NotImplementedError
 
@@ -97,14 +100,14 @@ def nested_print(this_name: str, root_dict: dict) -> None:
         elif isinstance(my_value, str):
             my_value_value = '"%s"' % my_value.replace('\n', '<LF>').replace('\r', '<CR>')
         else:
-            raise NotImplementedError
+            my_value_value = "Huh?"
 
         if not isinstance(my_value, dict):
-            stdout.write("%s%s = %s\n" % (this_name, my_key_value, my_value_value))
+            output += "%s%s = %s\n" % (this_name, my_key_value, my_value_value)
         else:
-            stdout.write("%s%s = %s\n" % (this_name, my_key_value, "dict()"))
-            nested_print(this_name+my_key_value, my_value)
-    return
+            output += "%s%s = %s\n" % (this_name, my_key_value, "dict()")
+            output += nested_print(this_name+my_key_value, my_value)
+    return output
 
 
 def job_loc2xpath(job_location: str) -> str:

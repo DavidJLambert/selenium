@@ -83,7 +83,7 @@ def main():
         try:
             if get_test_data:
                 stdout.write("BEGIN PRINTING JOBS.\n")
-                f.nested_print(nameof(jobs), jobs)
+                stdout.write(f.nested_print(nameof(jobs), jobs))
                 stdout.write("DONE PRINTING JOBS.\n")
 
             # Fetch jobs.

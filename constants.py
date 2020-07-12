@@ -19,13 +19,13 @@ JOB_IN_PERSON = "IN PERSON"
 JOB_LOCATIONS = {JOB_ONLINE, JOB_IN_PERSON}
 
 # For (re)initializing jobs and jobs_prev.
-JOB_ID = "Job_ID"
-JOB_AGE = "Job_Age"
-STUDENT_NAME = "Student_Name"
-JOB_TOPIC = "Job_Topic"
-PAY_RATE = "Job_Rate"
-JOB_DESCRIPTION = "Job_Description"
-CARD_NUMBER = "Card_Number"
+JOB_ID = "Job ID"
+JOB_AGE = "Job Age"
+STUDENT_NAME = "Student Name"
+JOB_TOPIC = "Job Topic"
+PAY_RATE = "Job Rate"
+JOB_DESCRIPTION = "Job Description"
+CARD_NUMBER = "Card Number"
 
 SMTP_SERVER = "smtp-mail.outlook.com"
 SMTP_PORT = 587
