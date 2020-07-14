@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.0
+VERSION: 0.2.1
 
-DATE: Jul 11, 2020
+DATE: Jul 14, 2020
 """
 import constants as c
 import re
