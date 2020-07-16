@@ -6,13 +6,10 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.1
+VERSION: 0.2.2
 
-DATE: Jul 14, 2020
+DATE: Jul 15, 2020
 """
-from constants import JOB_ONLINE, JOB_IN_PERSON
-
-from varname import nameof
 from sys import stdout, exc_info
 from traceback import print_exception
 from smtplib import SMTP
@@ -44,6 +41,7 @@ def send_email(smtp_server: str, port: int, password: str, sender: str,
         server.starttls(context=context)
         server.login(user=recipient, password=password)
         server.sendmail(from_addr=sender, to_addrs=recipient, msg=message.as_string())
+# End of function send_email.
 
 
 def get_boolean(prompt: str) -> bool:
@@ -108,23 +106,4 @@ def nested_print(this_name: str, root_dict: dict) -> str:
             output += "%s%s = %s\n" % (this_name, my_key_value, "dict()")
             output += nested_print(this_name+my_key_value, my_value)
     return output
-
-
-def job_loc2xpath(job_location: str) -> str:
-    """ Get the xpath for online and in-person job listings.
-
-    Parameters:
-        job_location (str): JOB_ONLINE or JOB_IN_PERSON.
-    Returns:
-        xpath (str): the job listings xpath for given job_location.
-    """
-    if job_location == JOB_ONLINE:
-        # Look for online jobs.
-        xpath = "//label[@for='lesson_type_online']"
-    elif job_location == JOB_IN_PERSON:
-        # Look for in-person jobs.
-        xpath = "//label[@for='lesson_type_in_person']"
-    else:
-        raise ValueError("Unknown job location: '%s'." % job_location)
-    return xpath
-# End of function job_loc2xpath.
+# End of function nested_print.

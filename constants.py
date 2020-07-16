@@ -6,17 +6,12 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.1
+VERSION: 0.2.2
 
-DATE: Jul 14, 2020
+DATE: Jul 15, 2020
 """
-TIMEOUT = 15  # Seconds.
-SLEEP_TIME = 15  # Seconds.
-
-# Fields in jobs and jobs_prev.
-JOB_ONLINE = "ONLINE"
-JOB_IN_PERSON = "IN PERSON"
-JOB_LOCATIONS = {JOB_ONLINE, JOB_IN_PERSON}
+TIMEOUT = 30  # Seconds.
+SLEEP_TIME = 30  # Seconds.
 
 # For (re)initializing jobs and jobs_prev.
 JOB_ID = "Job ID"

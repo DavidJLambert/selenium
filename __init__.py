@@ -6,7 +6,7 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.1
+VERSION: 0.2.2
 
-DATE: Jul 14, 2020
+DATE: Jul 15, 2020
 """

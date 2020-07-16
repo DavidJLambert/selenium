@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.1
+VERSION: 0.2.2
 
-DATE: Jul 14, 2020
+DATE: Jul 15, 2020
 """
 import constants as c
 import re
@@ -62,7 +62,7 @@ class Jobs(object):
     # End of method add_properties.
 
     def get_job_ids(self) -> set:
-        """  Find job_id's in both job_ids[job_loc] and job_ids_prev[job_loc].
+        """  Find job_id's in both job_ids and job_ids_prev.
 
         Parameters:
         Returns:
@@ -72,10 +72,10 @@ class Jobs(object):
     # End of method get_job_ids.
 
     def get_new_job_ids(self, job_ids_prev: set) -> set:
-        """  Find job_id's in both jobs[job_loc] and jobs_prev[job_loc].
+        """  Find job_id's in both jobs and jobs_prev.
 
         Parameters:
-            job_ids_prev (set): jobs_prev[job_loc].get_job_ids().
+            job_ids_prev (set): jobs_prev.get_job_ids().
         Returns:
             new_job_ids (set): the job_ids in self, but not in job_ids_prev.
         """
@@ -90,19 +90,18 @@ class Jobs(object):
         return set(new_job_ids)
     # End of method get_new_job_ids.
 
-    def get_job_data(self, job_data: str, job_id: str, job_loc: str) -> str:
+    def get_job_data(self, job_data: str, job_id: str) -> str:
         """  Extract job data from jobs[job_id], add to job_data.
 
         Parameters:
-            job_data (str): job_ids[job_loc].
-            job_id (str): job_ids_prev[job_loc].
-            job_loc (str): include in job_data.
+            job_data (str): job_ids.
+            job_id (str): job_ids_prev.
         Returns:
             job_data (str): the job IDs in current, but not in previous.
         """
         for key in self.jobs[job_id].keys():
             value = self.jobs[job_id][key]
-            job_data += "('%s', '%s', '%s'): '%s'\n" % (job_loc, job_id, key, value)
+            job_data += "('%s', '%s'): '%s'\n" % (job_id, key, value)
         return job_data
     # End of method get_job_data.
 
