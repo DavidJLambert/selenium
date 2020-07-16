@@ -71,13 +71,13 @@ def main():
 
             # Loop forever.
             while True:
+                # Fetch jobs.
 
                 if get_test_data:
                     stdout.write("BEGIN PRINTING JOBS.\n")
                     stdout.write(f.nested_print(nameof(jobs), jobs))
                     stdout.write("DONE PRINTING JOBS.\n")
 
-                # Fetch jobs.
                 # Save jobs into jobs_prev.  Skip if job_ids empty due to faulty page load.
                 if jobs.count_job_ids() > 0:
                     jobs_prev = deepcopy(jobs)
@@ -183,6 +183,7 @@ def main():
                         if do_log:
                             outfile.write(job_data)
                             outfile.flush()
+                    # Done iterating over new_job_ids.
             # End of inner while loop.
         except Exception:
             # Print exception.
