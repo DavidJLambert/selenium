@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.2
+VERSION: 0.2.3
 
-DATE: Jul 15, 2020
+DATE: Jul 20, 2020
 """
 import constants as c
 import re
@@ -90,19 +90,22 @@ class Jobs(object):
         return set(new_job_ids)
     # End of method get_new_job_ids.
 
-    def get_job_data(self, job_data: str, job_id: str) -> str:
+    def get_job_data(self, job_data: str, job_id: str) -> (str, str):
         """  Extract job data from jobs[job_id], add to job_data.
 
         Parameters:
             job_data (str): job_ids.
             job_id (str): job_ids_prev.
         Returns:
-            job_data (str): the job IDs in current, but not in previous.
+            job_summary (str): summary of this job.
+            job_data (str): all of the details of this job.
         """
         for key in self.jobs[job_id].keys():
             value = self.jobs[job_id][key]
             job_data += "('%s', '%s'): '%s'\n" % (job_id, key, value)
-        return job_data
+        job_summary = "%s: %s, %s: %s" % (c.JOB_TOPIC, self.jobs[job_id][c.JOB_TOPIC],
+                                          "Subject", self.jobs[job_id]["Subject"])
+        return job_summary, job_data
     # End of method get_job_data.
 
     def count_job_ids(self) -> int:

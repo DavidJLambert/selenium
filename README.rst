@@ -8,9 +8,9 @@ Using Selenium to Web Scrape wyzant.com
 
 :AUTHOR: David J. Lambert
 
-:VERSION: 0.2.2
+:VERSION: 0.2.3
 
-:DATE: DATE: Jul 15, 2020
+:DATE: DATE: Jul 20, 2020
 
 PROBLEM DESCRIPTION
 -------------------

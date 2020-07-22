@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.2
+VERSION: 0.2.3
 
-DATE: Jul 15, 2020
+DATE: Jul 20, 2020
 """
 import constants as c
 import functions as f
@@ -111,30 +111,33 @@ def main():
                     params[c.PAY_RATE] = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text.strip()
                     params[c.JOB_DESCRIPTION] = card_obj.find_element_by_xpath('./p[2]').text.strip()
 
-                    # Click "Show Details" control to see more job listing info.
-                    card_obj.find_element_by_xpath('./div[4]/div/div/p').click()
+                    # Does "Show Details" control exist?
+                    show_details = card_obj.find_elements_by_xpath('./div[4]/div/div/p')
+                    if len(show_details) == 1:
+                        # If "Show Details" exists, click it.
+                        show_details[0].click()
 
-                    # Each instance of class "spc_zero" contains one job attribute.
-                    spc_zeros = card_obj.find_elements_by_class_name("spc-zero")
+                        # Each instance of class "spc_zero" contains one job attribute.
+                        spc_zeros = card_obj.find_elements_by_class_name("spc-zero")
 
-                    # Iterate over all job attributes in class "spc_zero".
-                    for spc_zero in spc_zeros:
-                        # There are 1-2 children of class "spc_zero".
-                        children = spc_zero.find_elements_by_xpath('./child::*')
-                        if len(children) == 2:
-                            # Job attribute in 2nd child of class "spc_zero".
-                            value = spc_zero.find_element_by_xpath('./span[2]').text.strip()
-                        else:
-                            # Sometimes the job availability attribute isn't the 2nd child of class "spc_zero".
-                            xpath = './../p[@class="text-semibold spc-tiny"]'
-                            items = spc_zero.find_elements_by_xpath(xpath)
-                            value = "; ".join([item.text for item in items]).strip()
+                        # Iterate over all job attributes in class "spc_zero".
+                        for spc_zero in spc_zeros:
+                            # There are 1-2 children of class "spc_zero".
+                            children = spc_zero.find_elements_by_xpath('./child::*')
+                            if len(children) == 2:
+                                # Job attribute in 2nd child of class "spc_zero".
+                                value = spc_zero.find_element_by_xpath('./span[2]').text.strip()
+                            else:
+                                # Sometimes the job availability attribute isn't the 2nd child of class "spc_zero".
+                                xpath = './../p[@class="text-semibold spc-tiny"]'
+                                items = spc_zero.find_elements_by_xpath(xpath)
+                                value = "; ".join([item.text for item in items]).strip()
 
-                        # Job attribute in 1st child of class "spc_zero".
-                        my_key = spc_zero.find_element_by_xpath('./span[1]').text
-                        my_key = my_key.replace(":", "").strip()
-                        params[my_key] = value
-                    # Done iterating over all job attributes in class "spc_zero".
+                            # Job attribute in 1st child of class "spc_zero".
+                            my_key = spc_zero.find_element_by_xpath('./span[1]').text
+                            my_key = my_key.replace(":", "").strip()
+                            params[my_key] = value
+                        # Done iterating over all job attributes in class "spc_zero".
 
                     # Save job properties in new instance of class Jobs.
                     jobs.add_job(**params)
@@ -167,7 +170,7 @@ def main():
                     for job_id in new_job_ids:
                         # Collect job data.
                         email_subject = "New job at www.wyzant.com/tutor/jobs/%s" % job_id
-                        job_data = jobs.get_job_data(email_subject + "\n", job_id)
+                        job_summary, job_data = jobs.get_job_data(email_subject + "\n", job_id)
 
                         # Make audible tone.
                         if do_beep:
@@ -178,10 +181,10 @@ def main():
                             f.send_email(c.SMTP_SERVER, c.SMTP_PORT, c.SMTP_PASSWORD, c.EMAIL_SENDER,
                                          c.EMAIL_RECIPIENT, subject=email_subject, body=job_data)
 
-                        # Print and write to log file the job data.
+                        # Print the job data, write job summary to log file.
                         stdout.write(job_data)
                         if do_log:
-                            outfile.write(job_data)
+                            outfile.write(job_summary + "\n")
                             outfile.flush()
                     # Done iterating over new_job_ids.
             # End of inner while loop.

@@ -10,3 +10,5 @@ __pycache__/
 junk/
 debug.log
 version.txt
+log.txt
+error.txt

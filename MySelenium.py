@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.2
+VERSION: 0.2.3
 
-DATE: Jul 15, 2020
+DATE: Jul 20, 2020
 """
 from constants import BY_ID, BY_PAGE_TITLE, TIMEOUT
 from functions import print_stacktrace
@@ -142,8 +142,6 @@ class MySelenium(object):
 
     def get_related_by_class(self, class_name: str):
         """ Return HTML elements with a class name.
-            It is not worth the effort to encapsulate other HTML elements,
-            so they are directly accessed in wyzant.old.py.
 
         Parameters:
             class_name (str): return all HTML elements with this class name.

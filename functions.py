@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.2
+VERSION: 0.2.3
 
-DATE: Jul 15, 2020
+DATE: Jul 20, 2020
 """
 from sys import stdout, exc_info
 from traceback import print_exception
