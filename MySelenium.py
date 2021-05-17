@@ -6,11 +6,11 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.3
+VERSION: 0.3.0
 
-DATE: Jul 20, 2020
+DATE: May 16, 2021
 """
-from constants import BY_ID, BY_PAGE_TITLE, TIMEOUT
+from constants import BY_ID, BY_PAGE_TITLE, TIMEOUT, SELENIUM_OPTIONS
 from functions import print_stacktrace
 
 from time import sleep
@@ -37,10 +37,22 @@ class MySelenium(object):
         """
         self.options = Options()
         self.options.headless = True
-        self.options.add_argument("--window-size=1920,1080")
+        self.options.add_argument(SELENIUM_OPTIONS)
 
         self.driver = webdriver.Chrome(options=self.options)
     # End of method __init__.
+
+    def force_refresh(self, method: str, identifier: str) -> None:
+        """ Force Selenium to refresh web page.
+        Parameters:
+            method (str): method to wait for refresh, BY_ID or BY_PAGE_TITLE
+            identifier (str): if method = BY_PAGE_TITLE, title of web page shown
+                after logging in.  if method = BY_ID, HTML element ID.
+        Returns:
+        """
+        self.driver.refresh()
+        self.wait_for_refresh(method, identifier)
+    # End of method force_refresh.
 
     def wait_for_refresh(self, method: str, identifier: str) -> None:
         """ Make Selenium wait for web page to post.

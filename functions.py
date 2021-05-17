@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.3
+VERSION: 0.3.0
 
-DATE: Jul 20, 2020
+DATE: May 16, 2021
 """
 from sys import stdout, exc_info
 from traceback import print_exception
@@ -107,3 +107,26 @@ def nested_print(this_name: str, root_dict: dict) -> str:
             output += nested_print(this_name+my_key_value, my_value)
     return output
 # End of function nested_print.
+
+
+def age_to_minutes(age: str) -> int:
+    """ Convert job age to minutes.
+
+    Parameters:
+        age (str): age of job, in units of minutes, hours, or days.
+    Returns:
+        length (int): age of job in minutes.
+    """
+    units = age[-1]
+    length = int(age[:-1])
+    if units == 'm':
+        pass
+    elif units == 'h':
+        length = 60 * length
+    elif units == 'd':
+        length = 60 * 24 * length
+    else:
+        # Ages greater than 7 days formatted as "mmm d"
+        length = 60 * 24 * 7
+    return length
+# End of function print_stacktrace.

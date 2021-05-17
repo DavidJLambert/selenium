@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.3
+VERSION: 0.3.0
 
-DATE: Jul 20, 2020
+DATE: May 16, 2021
 """
 import constants as c
 import functions as f
@@ -21,7 +21,6 @@ from winsound import Beep
 from datetime import datetime
 from time import sleep
 
-from varname import nameof
 from Check_Chromedriver import Check_Chromedriver
 
 
@@ -36,7 +35,7 @@ def main():
     do_log = f.get_boolean("Save activity to log? ")
 
     # Print jobs nested dictionary, used in test_MyFunctions.
-    get_test_data = False
+    get_test_data = True
 
     # On Exception, come back to here and re-initialize everything.
     while True:
@@ -69,17 +68,16 @@ def main():
             my_selenium.go_to_web_page(c.JOBS_PAGE_URL, c.BY_ID, c.JOBS_LIST)
             stdout.write("At Wyzant job listings page.\n")
 
+            xpath = "//label[@for='lesson_type_online']"
+            my_selenium.click_sleep_wait(xpath, c.SLEEP_TIME, c.BY_ID, c.JOBS_LIST)
+            stdout.write("Fetched Wyzant jobs list.  ")
+
             # Loop forever.
             while True:
-                # Fetch jobs.
-
-                if get_test_data:
-                    stdout.write("BEGIN PRINTING JOBS.\n")
-                    stdout.write(f.nested_print(nameof(jobs), jobs))
-                    stdout.write("DONE PRINTING JOBS.\n")
+                my_selenium.force_refresh(c.BY_ID, c.JOBS_LIST)
 
                 # Save jobs into jobs_prev.  Skip if job_ids empty due to faulty page load.
-                if jobs.count_job_ids() > 0:
+                if jobs.count_jobs() > 0:
                     jobs_prev = deepcopy(jobs)
                     jobs.reset()
 
@@ -90,10 +88,6 @@ def main():
                     outfile.write(date_time + "\n")
                     outfile.flush()
 
-                xpath = "//label[@for='lesson_type_online']"
-                my_selenium.click_sleep_wait(xpath, c.SLEEP_TIME, c.BY_ID, c.JOBS_LIST)
-                stdout.write("Fetched Wyzant jobs list.  ")
-
                 # Each instance of class "academy-card" contains 1 job, 10 visible.
                 academy_cards = my_selenium.get_related_by_class("academy-card")
 
@@ -103,12 +97,19 @@ def main():
 
                     # Save job properties.
                     params = dict()
-                    params[c.JOB_ID] = job_url.split("/")[-1].strip()
+                    params[c.JOB_ID] = int(job_url.split("/")[-1].strip())
                     params[c.CARD_NUMBER] = card_num
-                    params[c.JOB_AGE] = card_obj.find_element_by_xpath('./div[1]/span').text.strip()
+                    job_age_info = card_obj.find_element_by_xpath('./div[1]/span[1]').text.strip()
+                    if job_age_info == "No applications yet":
+                        params[c.APPLICATIONS] = "N"
+                        job_age_info = card_obj.find_element_by_xpath('./div[1]/span[2]').text.strip()
+                    else:
+                        params[c.APPLICATIONS] = "Y"
+                    params[c.JOB_AGE] = f.age_to_minutes(job_age_info)
                     params[c.STUDENT_NAME] = card_obj.find_element_by_xpath('./p[1]').text.strip()
                     params[c.JOB_TOPIC] = card_obj.find_element_by_xpath('./h3/a').text.strip()
-                    params[c.PAY_RATE] = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text.strip()
+                    pay_rate = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text.strip()
+                    params[c.PAY_RATE] = pay_rate.replace("Recommended rate: ", "")
                     params[c.JOB_DESCRIPTION] = card_obj.find_element_by_xpath('./p[2]').text.strip()
 
                     # Does "Show Details" control exist?
@@ -154,15 +155,14 @@ def main():
 
                 # Look for new jobs.
                 # Get job IDs in job_ids and not in job_ids_prev.
-                current_num = jobs.count_job_ids()
-                previous_num = jobs_prev.count_job_ids()
+                current_num = jobs.count_jobs()
+                previous_num = jobs_prev.count_jobs()
                 # Skip if job_ids or job_ids_prev empty (1st loop or faulty page load).
                 if current_num <= 0:
                     stdout.write("Current  # Job IDs: %d.\n" % current_num)
                 elif previous_num <= 0:
                     stdout.write("Previous # Job IDs: %d.\n" % previous_num)
                 else:
-                    # Could also restrict myself to jobs with age < 1h.
                     job_ids_previous = jobs_prev.get_job_ids()
                     new_job_ids = jobs.get_new_job_ids(job_ids_previous)
 
@@ -187,6 +187,12 @@ def main():
                             outfile.write(job_summary + "\n")
                             outfile.flush()
                     # Done iterating over new_job_ids.
+
+                if get_test_data and jobs is not None:
+                    stdout.write("BEGIN PRINTING JOBS.\n")
+                    stdout.write(str(jobs)+'\n')
+                    stdout.write("DONE PRINTING JOBS.\n")
+
             # End of inner while loop.
         except Exception:
             # Print exception.

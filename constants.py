@@ -6,21 +6,22 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.2.3
+VERSION: 0.3.0
 
-DATE: Jul 20, 2020
+DATE: May 16, 2021
 """
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 30  # Seconds.
 
 # For (re)initializing jobs and jobs_prev.
 JOB_ID = "Job ID"
-JOB_AGE = "Job Age"
-STUDENT_NAME = "Student Name"
-JOB_TOPIC = "Job Topic"
-PAY_RATE = "Job Rate"
-JOB_DESCRIPTION = "Job Description"
-CARD_NUMBER = "Card Number"
+APPLICATIONS = "Applications"
+JOB_AGE = "Age"
+STUDENT_NAME = "Name"
+JOB_TOPIC = "Topic"
+PAY_RATE = "Rate"
+JOB_DESCRIPTION = "Description"
+CARD_NUMBER = "Card #"
 
 SMTP_SERVER = "smtp-mail.outlook.com"
 SMTP_PORT = 587
@@ -28,7 +29,7 @@ SMTP_PASSWORD = "!V15%5lzBiGv^34N"
 EMAIL_SENDER = "David_J_lambert@outlook.com"
 EMAIL_RECIPIENT = "David_J_lambert@outlook.com"
 
-SELENIUM_OPTIONS = ["--window-size=1920,1080"]
+SELENIUM_OPTIONS = "--window-size=1920,1200"
 
 # Wyzant.com login information.
 USERNAME = "david.lambert.3"
