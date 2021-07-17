@@ -157,7 +157,7 @@ def main():
                 # Get job IDs in job_ids and not in job_ids_prev.
                 current_num = jobs.count_jobs()
                 previous_num = jobs_prev.count_jobs()
-                # Skip if job_ids or job_ids_prev has <= 10 entries (1st loop or faulty page load).
+                # Skip if job_ids or job_ids_prev empty (1st loop or faulty page load).
                 if current_num <= 0:
                     stdout.write(f"Current  # Job IDs: {current_num}.\n")
                 elif previous_num <= 0:
