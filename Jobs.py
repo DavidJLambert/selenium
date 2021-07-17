@@ -105,7 +105,7 @@ class Jobs(object):
         return set(new_job_ids)
     # End of method get_new_job_ids.
 
-    def get_job_data(self, job_data: str, job_id: str) -> (str, str):
+    def get_job_data(self, job_data: str, job_id: str) -> (str, str, int):
         """  Extract job data from jobs[job_id], add to job_data.
 
         Parameters:
@@ -114,13 +114,16 @@ class Jobs(object):
         Returns:
             job_summary (str): summary of this job.
             job_data (str): all of the details of this job.
+            age (int): the age of the job, in minutes.
         """
         for key in self.jobs[job_id].keys():
             value = self.jobs[job_id][key]
-            job_data += "('%d', '%d'): '%s'\n" % (job_id, key, value)
-        job_summary = "%s: %s, %s: %s" % (c.JOB_TOPIC, self.jobs[job_id][c.JOB_TOPIC],
-                                          "Subject", self.jobs[job_id]["Subject"])
-        return job_summary, job_data
+            job_data += f"('{job_id}', '{key}'): '{value}'\n"
+        topic = self.jobs[job_id][c.JOB_TOPIC]
+        subject = self.jobs[job_id]["Subject"]
+        age = self.jobs[job_id]["Age"]
+        job_summary = f"{c.JOB_TOPIC}: {topic}, Subject: {subject}"
+        return job_summary, job_data, age
     # End of method get_job_data.
 
     def count_jobs(self) -> int:

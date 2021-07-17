@@ -87,23 +87,24 @@ def nested_print(this_name: str, root_dict: dict) -> str:
     output = ""
     for my_key, my_value in root_dict.items():
         if isinstance(my_key, int):
-            my_key_value = "[%d]" % my_key
+            my_key_value = f"[{my_key}]"
         elif isinstance(my_key, str):
-            my_key_value = '["%s"]' % my_key
+            my_key_value = f'["{my_key}"]'
         else:
             raise NotImplementedError
 
         if isinstance(my_value, int):
-            my_value_value = "%d" % my_value
+            my_value_value = f"{my_value}"
         elif isinstance(my_value, str):
-            my_value_value = '"%s"' % my_value.replace('\n', '<LF>').replace('\r', '<CR>')
+            my_value_value = my_value.replace('\n', '<LF>').replace('\r', '<CR>')
+            my_value_value = f'"{my_value_value}"'
         else:
             my_value_value = "WTF?"
 
         if not isinstance(my_value, dict):
-            output += "%s%s = %s\n" % (this_name, my_key_value, my_value_value)
+            output += f"{this_name}{my_key_value} = {my_value_value}\n"
         else:
-            output += "%s%s = %s\n" % (this_name, my_key_value, "dict()")
+            output += f"{this_name}{my_key_value} = dict()\n"
             output += nested_print(this_name+my_key_value, my_value)
     return output
 # End of function nested_print.

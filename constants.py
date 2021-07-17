@@ -29,7 +29,7 @@ SMTP_PASSWORD = "!V15%5lzBiGv^34N"
 EMAIL_SENDER = "David_J_lambert@outlook.com"
 EMAIL_RECIPIENT = "David_J_lambert@outlook.com"
 
-SELENIUM_OPTIONS = "--window-size=1920,1200"
+SELENIUM_OPTIONS = "--window-size=1920,2200"
 
 # Wyzant.com login information.
 USERNAME = "david.lambert.3"
@@ -48,4 +48,6 @@ JOBS_PAGE_TITLE = "Jobs | Wyzant Tutoring"
 # How to wait for refresh
 BY_ID = "BY ID"
 BY_PAGE_TITLE = "BY PAGE TITLE"
+BY_CLASS = "BY CLASS"
 JOBS_LIST = "jobs-list"
+UI_PAGE_LINK = "ui-page-link"

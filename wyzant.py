@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.3.0
+VERSION: 0.3.1
 
-DATE: May 16, 2021
+DATE: July 17, 2021
 """
 import constants as c
 import functions as f
@@ -21,7 +21,7 @@ from winsound import Beep
 from datetime import datetime
 from time import sleep
 
-from Check_Chromedriver import Check_Chromedriver
+# from Check_Chromedriver import Check_Chromedriver
 
 
 def main():
@@ -34,8 +34,8 @@ def main():
     do_email = f.get_boolean("Email when new job found? ")
     do_log = f.get_boolean("Save activity to log? ")
 
-    # Print jobs nested dictionary, used in test_MyFunctions.
-    get_test_data = True
+    # Print jobs.
+    print_jobs = False
 
     # On Exception, come back to here and re-initialize everything.
     while True:
@@ -45,10 +45,10 @@ def main():
             jobs_prev = Jobs()
 
             # Check the version of chromedriver.exe, and update when needed.
-            Check_Chromedriver.driver_mother_path = "./"
-            Check_Chromedriver.main()
+            # Check_Chromedriver.driver_mother_path = r"C:\Program Files\WebDrivers"
+            # Check_Chromedriver.main()
 
-            stdout.write("Done checking the version of chromedriver.exe.\n\n")
+            # stdout.write("Done checking the version of chromedriver.exe.\n\n")
 
             # Open output file for appending.
             if do_log:
@@ -65,16 +65,16 @@ def main():
                                       c.PASSWORD_FIELD_XPATH, c.LOGIN_BUTTON_XPATH)
             stdout.write("Done logging into Wyzant.\n")
             stdout.write("Going to the Wyzant job listings page.\n")
-            my_selenium.go_to_web_page(c.JOBS_PAGE_URL, c.BY_ID, c.JOBS_LIST)
+            my_selenium.go_to_web_page(c.JOBS_PAGE_URL, c.BY_CLASS, c.UI_PAGE_LINK)
             stdout.write("At Wyzant job listings page.\n")
 
             xpath = "//label[@for='lesson_type_online']"
-            my_selenium.click_sleep_wait(xpath, c.SLEEP_TIME, c.BY_ID, c.JOBS_LIST)
+            my_selenium.click_sleep_wait(xpath, c.SLEEP_TIME, c.BY_CLASS, c.UI_PAGE_LINK)
             stdout.write("Fetched Wyzant jobs list.  ")
 
             # Loop forever.
             while True:
-                my_selenium.force_refresh(c.BY_ID, c.JOBS_LIST)
+                my_selenium.force_refresh(c.BY_CLASS, c.UI_PAGE_LINK)
 
                 # Save jobs into jobs_prev.  Skip if job_ids empty due to faulty page load.
                 if jobs.count_jobs() > 0:
@@ -88,7 +88,7 @@ def main():
                     outfile.write(date_time + "\n")
                     outfile.flush()
 
-                # Each instance of class "academy-card" contains 1 job, 10 visible.
+                # Each instance of class "academy-card" contains 1 job, 10 visible per page.
                 academy_cards = my_selenium.get_related_by_class("academy-card")
 
                 for card_num, card_obj in enumerate(academy_cards):
@@ -145,9 +145,9 @@ def main():
 
                     # Print progress, on just one line.
                     if card_num == 0:
-                        stdout.write("Done fetching job %d" % card_num)
+                        stdout.write(f"Done fetching job {card_num}")
                     else:
-                        stdout.write(", %d" % card_num)
+                        stdout.write(f", {card_num}")
                 # Done iterating over academy_cards.
 
                 # After stdout.write, need to add newline.
@@ -157,11 +157,11 @@ def main():
                 # Get job IDs in job_ids and not in job_ids_prev.
                 current_num = jobs.count_jobs()
                 previous_num = jobs_prev.count_jobs()
-                # Skip if job_ids or job_ids_prev empty (1st loop or faulty page load).
+                # Skip if job_ids or job_ids_prev has <= 10 entries (1st loop or faulty page load).
                 if current_num <= 0:
-                    stdout.write("Current  # Job IDs: %d.\n" % current_num)
+                    stdout.write(f"Current  # Job IDs: {current_num}.\n")
                 elif previous_num <= 0:
-                    stdout.write("Previous # Job IDs: %d.\n" % previous_num)
+                    stdout.write(f"Previous # Job IDs: {previous_num}.\n")
                 else:
                     job_ids_previous = jobs_prev.get_job_ids()
                     new_job_ids = jobs.get_new_job_ids(job_ids_previous)
@@ -169,30 +169,33 @@ def main():
                     # Iterate over all new job listings.
                     for job_id in new_job_ids:
                         # Collect job data.
-                        email_subject = "New job at www.wyzant.com/tutor/jobs/%s" % job_id
-                        job_summary, job_data = jobs.get_job_data(email_subject + "\n", job_id)
+                        email_subject = f"New job at www.wyzant.com/tutor/jobs/{job_id}"
+                        job_summary, job_data, age = jobs.get_job_data(email_subject + "\n", job_id)
 
-                        # Make audible tone.
-                        if do_beep:
-                            Beep(6000, 1000)
+                        if age <= 120:
+                            # Make audible tone.
+                            if do_beep:
+                                Beep(6000, 1000)
 
-                        # Send email.
-                        if do_email:
-                            f.send_email(c.SMTP_SERVER, c.SMTP_PORT, c.SMTP_PASSWORD, c.EMAIL_SENDER,
-                                         c.EMAIL_RECIPIENT, subject=email_subject, body=job_data)
+                            # Send email.
+                            if do_email:
+                                f.send_email(c.SMTP_SERVER, c.SMTP_PORT, c.SMTP_PASSWORD, c.EMAIL_SENDER,
+                                             c.EMAIL_RECIPIENT, subject=email_subject, body=job_data)
 
-                        # Print the job data, write job summary to log file.
-                        stdout.write(job_data)
-                        if do_log:
-                            outfile.write(job_summary + "\n")
-                            outfile.flush()
+                            # Print the job data, write job summary to log file.
+                            stdout.write(job_data)
+                            if do_log:
+                                outfile.write(job_summary + "\n")
+                                outfile.flush()
                     # Done iterating over new_job_ids.
 
-                if get_test_data and jobs is not None:
+                if print_jobs and jobs is not None:
                     stdout.write("BEGIN PRINTING JOBS.\n")
                     stdout.write(str(jobs)+'\n')
                     stdout.write("DONE PRINTING JOBS.\n")
 
+                # Wait some more, so that jobs page polled about every 30 seconds.
+                sleep(20)
             # End of inner while loop.
         except Exception:
             # Print exception.
