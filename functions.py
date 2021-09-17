@@ -131,3 +131,16 @@ def age_to_minutes(age: str) -> int:
         length = 60 * 24 * 7
     return length
 # End of function print_stacktrace.
+
+
+def class_members(_class) -> list:
+    """ Get the non-special members of a class.
+
+    Parameters:
+        _class (class): the class to examine.
+    Returns:
+        members (list): list of the non-special members of a class.
+    """
+    members = [v for k, v in _class.__dict__.items() if k[0] != "_"]
+    return members
+# End of function print_stacktrace.

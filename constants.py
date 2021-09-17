@@ -46,8 +46,6 @@ JOBS_PAGE_URL = "https://www.wyzant.com/tutor/jobs"
 JOBS_PAGE_TITLE = "Jobs | Wyzant Tutoring"
 
 # How to wait for refresh
-BY_ID = "BY ID"
-BY_PAGE_TITLE = "BY PAGE TITLE"
-BY_CLASS = "BY CLASS"
+BY_PAGE_TITLE = "by page title"
 JOBS_LIST = "jobs-list"
 UI_PAGE_LINK = "ui-page-link"

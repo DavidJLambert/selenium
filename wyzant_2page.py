@@ -6,19 +6,11 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.3.1
+VERSION: 0.3.0
 
-DATE: July 17, 2021
+DATE: May 16, 2021
 """
 from selenium.webdriver.common.by import By
-# CLASS_NAME = 'class name'
-# CSS_SELECTOR = 'css selector'
-# ID = 'id'
-# LINK_TEXT = 'link text'
-# NAME = 'name'
-# PARTIAL_LINK_TEXT = 'partial link text'
-# TAG_NAME = 'tag name'
-# XPATH = 'xpath'
 import constants as c
 import functions as f
 from MySelenium import MySelenium
@@ -29,8 +21,6 @@ from copy import deepcopy
 from winsound import Beep
 from datetime import datetime
 from time import sleep
-
-# from Check_Chromedriver import Check_Chromedriver
 
 
 def main():
@@ -43,8 +33,8 @@ def main():
     do_email = f.get_boolean("Email when new job found? ")
     do_log = f.get_boolean("Save activity to log? ")
 
-    # Print jobs.
-    print_jobs = False
+    # Print jobs nested dictionary, used in test_MyFunctions.
+    get_test_data = False
 
     # On Exception, come back to here and re-initialize everything.
     while True:
@@ -97,66 +87,75 @@ def main():
                     outfile.write(date_time + "\n")
                     outfile.flush()
 
-                # Each instance of class "academy-card" contains 1 job, 10 visible per page.
-                academy_cards = my_selenium.get_all_related_by_class("academy-card")
+                for page_num in [1, 2]:
+                    # Click back and forth between pages 1 and page 2.
+                    xpath = f'//div[@role="navigation"]/a[text()="{page_num}"]'
+                    pages = my_selenium.find_elements_by_xpath(xpath)
+                    # print("selecting: " + pages[0].text)
+                    pages[0].click()
 
-                for card_num, card_obj in enumerate(academy_cards):
-                    # Get Job listing URL.
-                    job_url = card_obj.find_element_by_xpath('./h3/a').get_attribute('href')
+                    # Each instance of class "academy-card" contains 1 job, 10 visible per page.
+                    academy_cards = my_selenium.get_all_related_by_class("academy-card")
 
-                    # Save job properties.
-                    params = dict()
-                    params[c.JOB_ID] = int(job_url.split("/")[-1].strip())
-                    params[c.CARD_NUMBER] = card_num
-                    job_age_info = card_obj.find_element_by_xpath('./div[1]/span[1]').text.strip()
-                    if job_age_info == "No applications yet":
-                        params[c.APPLICATIONS] = "N"
-                        job_age_info = card_obj.find_element_by_xpath('./div[1]/span[2]').text.strip()
-                    else:
-                        params[c.APPLICATIONS] = "Y"
-                    params[c.JOB_AGE] = f.age_to_minutes(job_age_info)
-                    params[c.STUDENT_NAME] = card_obj.find_element_by_xpath('./p[1]').text.strip()
-                    params[c.JOB_TOPIC] = card_obj.find_element_by_xpath('./h3/a').text.strip()
-                    pay_rate = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text.strip()
-                    params[c.PAY_RATE] = pay_rate.replace("Recommended rate: ", "")
-                    params[c.JOB_DESCRIPTION] = card_obj.find_element_by_xpath('./p[2]').text.strip()
+                    for card_num, card_obj in enumerate(academy_cards):
+                        # Get Job listing URL.
+                        job_url = card_obj.find_element_by_xpath('./h3/a').get_attribute('href')
+                        card_num_display = 10*(page_num-1) + card_num
 
-                    # Does "Show Details" control exist?
-                    show_details = card_obj.find_elements_by_xpath('./div[4]/div/div/p')
-                    if len(show_details) == 1:
-                        # If "Show Details" exists, click it.
-                        show_details[0].click()
+                        # Save job properties.
+                        params = dict()
+                        params[c.JOB_ID] = int(job_url.split("/")[-1].strip())
+                        params[c.CARD_NUMBER] = card_num_display
+                        job_age_info = card_obj.find_element_by_xpath('./div[1]/span[1]').text.strip()
+                        if job_age_info == "No applications yet":
+                            params[c.APPLICATIONS] = "N"
+                            job_age_info = card_obj.find_element_by_xpath('./div[1]/span[2]').text.strip()
+                        else:
+                            params[c.APPLICATIONS] = "Y"
+                        params[c.JOB_AGE] = f.age_to_minutes(job_age_info)
+                        params[c.STUDENT_NAME] = card_obj.find_element_by_xpath('./p[1]').text.strip()
+                        params[c.JOB_TOPIC] = card_obj.find_element_by_xpath('./h3/a').text.strip()
+                        pay_rate = card_obj.find_element_by_xpath('./div[3]/span/div/div[1]/span').text.strip()
+                        params[c.PAY_RATE] = pay_rate.replace("Recommended rate: ", "")
+                        params[c.JOB_DESCRIPTION] = card_obj.find_element_by_xpath('./p[2]').text.strip()
 
-                        # Each instance of class "spc_zero" contains one job attribute.
-                        spc_zeros = card_obj.find_elements_by_class_name("spc-zero")
+                        # Does "Show Details" control exist?
+                        show_details = card_obj.find_elements_by_xpath('./div[4]/div/div/p')
+                        if len(show_details) == 1:
+                            # If "Show Details" exists, click it.
+                            show_details[0].click()
 
-                        # Iterate over all job attributes in class "spc_zero".
-                        for spc_zero in spc_zeros:
-                            # There are 1-2 children of class "spc_zero".
-                            children = spc_zero.find_elements_by_xpath('./child::*')
-                            if len(children) == 2:
-                                # Job attribute in 2nd child of class "spc_zero".
-                                value = spc_zero.find_element_by_xpath('./span[2]').text.strip()
-                            else:
-                                # Sometimes the job availability attribute isn't the 2nd child of class "spc_zero".
-                                xpath = './../p[@class="text-semibold spc-tiny"]'
-                                items = spc_zero.find_elements_by_xpath(xpath)
-                                value = "; ".join([item.text for item in items]).strip()
+                            # Each instance of class "spc_zero" contains one job attribute.
+                            spc_zeros = card_obj.find_elements_by_class_name("spc-zero")
 
-                            # Job attribute in 1st child of class "spc_zero".
-                            my_key = spc_zero.find_element_by_xpath('./span[1]').text
-                            my_key = my_key.replace(":", "").strip()
-                            params[my_key] = value
-                        # Done iterating over all job attributes in class "spc_zero".
+                            # Iterate over all job attributes in class "spc_zero".
+                            for spc_zero in spc_zeros:
+                                # There are 1-2 children of class "spc_zero".
+                                children = spc_zero.find_elements_by_xpath('./child::*')
+                                if len(children) == 2:
+                                    # Job attribute in 2nd child of class "spc_zero".
+                                    value = spc_zero.find_element_by_xpath('./span[2]').text.strip()
+                                else:
+                                    # Sometimes the job availability attribute isn't the 2nd child of class "spc_zero".
+                                    xpath = './../p[@class="text-semibold spc-tiny"]'
+                                    items = spc_zero.find_elements_by_xpath(xpath)
+                                    value = "; ".join([item.text for item in items]).strip()
 
-                    # Save job properties in new instance of class Jobs.
-                    jobs.add_job(**params)
+                                # Job attribute in 1st child of class "spc_zero".
+                                my_key = spc_zero.find_element_by_xpath('./span[1]').text
+                                my_key = my_key.replace(":", "").strip()
+                                params[my_key] = value
+                            # Done iterating over all job attributes in class "spc_zero".
 
-                    # Print progress, on just one line.
-                    if card_num == 0:
-                        stdout.write(f"Done fetching job {card_num}")
-                    else:
-                        stdout.write(f", {card_num}")
+                        # Save job properties in new instance of class Jobs.
+                        jobs.add_job(**params)
+
+                        # Print progress, on just one line.
+                        if card_num_display == 0:
+                            stdout.write(f"Done fetching job {card_num_display}")
+                        else:
+                            stdout.write(f", {card_num_display}")
+
                 # Done iterating over academy_cards.
 
                 # After stdout.write, need to add newline.
@@ -166,10 +165,10 @@ def main():
                 # Get job IDs in job_ids and not in job_ids_prev.
                 current_num = jobs.count_jobs()
                 previous_num = jobs_prev.count_jobs()
-                # Skip if job_ids or job_ids_prev empty (1st loop or faulty page load).
-                if current_num <= 0:
+                # Skip if job_ids or job_ids_prev has <= 10 entries (1st loop or faulty page load).
+                if current_num <= 10:
                     stdout.write(f"Current  # Job IDs: {current_num}.\n")
-                elif previous_num <= 0:
+                elif previous_num <= 10:
                     stdout.write(f"Previous # Job IDs: {previous_num}.\n")
                 else:
                     job_ids_previous = jobs_prev.get_job_ids()
@@ -198,13 +197,11 @@ def main():
                                 outfile.flush()
                     # Done iterating over new_job_ids.
 
-                if print_jobs and jobs is not None:
+                if get_test_data and jobs is not None:
                     stdout.write("BEGIN PRINTING JOBS.\n")
                     stdout.write(str(jobs)+'\n')
                     stdout.write("DONE PRINTING JOBS.\n")
 
-                # Wait some more, so that jobs page polled about every 30 seconds.
-                sleep(20)
             # End of inner while loop.
         except Exception:
             # Print exception.

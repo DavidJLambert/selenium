@@ -10,8 +10,8 @@ VERSION: 0.3.0
 
 DATE: May 16, 2021
 """
-from constants import BY_ID, BY_PAGE_TITLE, BY_CLASS, TIMEOUT, SELENIUM_OPTIONS
-from functions import print_stacktrace
+from constants import BY_PAGE_TITLE, TIMEOUT, SELENIUM_OPTIONS
+from functions import print_stacktrace, class_members
 
 from time import sleep
 from sys import stdout
@@ -38,7 +38,7 @@ class MySelenium(object):
         Returns:
         """
         self.options = Options()
-        self.options.headless = True
+        self.options.headless = False
         self.options.add_argument(SELENIUM_OPTIONS)
 
         self.driver = webdriver.Chrome(options=self.options,
@@ -48,11 +48,8 @@ class MySelenium(object):
     def force_refresh(self, method: str, identifier: str) -> None:
         """ Force Selenium to refresh web page.
         Parameters:
-            method (str): method to wait for refresh, BY_ID, BY_PAGE_TITLE, or BY_CLASS.
-            identifier (str):
-                method = BY_PAGE_TITLE, title of web page shown after logging in.
-                method = BY_ID, HTML element ID.
-                method = BY_CLASS, HTML element class.
+            method (str): c.BY_PAGE_TITLE or a value in selenium.webdriver.common.by.By.
+            identifier (str): the identifier to search for.
         Returns:
         """
         self.driver.refresh()
@@ -63,47 +60,20 @@ class MySelenium(object):
         """ Make Selenium wait for web page to post.
 
         Parameters:
-            method (str): method to wait for refresh, BY_ID, BY_PAGE_TITLE, or BY_CLASS.
-            identifier (str):
-                method = BY_PAGE_TITLE, title of web page shown after logging in.
-                method = BY_ID, HTML element ID.
-                method = BY_CLASS, HTML element class.
+            method (str): c.BY_PAGE_TITLE or a value in selenium.webdriver.common.by.By.
+            identifier (str): the identifier to search for.
         Returns:
         """
         try:
             if method == BY_PAGE_TITLE:
                 WebDriverWait(self.driver, TIMEOUT).until(EC.title_is(identifier))
-            elif method == BY_ID:
-                WebDriverWait(self.driver, TIMEOUT).until(EC.visibility_of_element_located((By.ID, identifier)))
-            elif method == BY_CLASS:
-                WebDriverWait(self.driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, identifier)))
+            elif method in class_members(By):
+                WebDriverWait(self.driver, TIMEOUT).until(EC.visibility_of_element_located((method, identifier)))
             else:
-                raise ValueError("Unknown Method.")
+                raise ValueError(f"Unknown Method '{method}'.")
         except TimeoutException:
             print_stacktrace()
     # End of method wait_for_refresh.
-
-    def wait_for_refresh2(self, my_driver: webdriver.chrome.webdriver.WebDriver, EC_type: type,
-                      BY_type: str, location: str, sleep_time: int) -> None:
-        """ Not implemented.
-
-        Parameters:
-            my_driver (webdriver.chrome.webdriver.WebDriver): Selenium object.
-            EC_type (type): EC attribute to use.
-            BY_type (str): BY attribute to use.
-            location (str): string value for EC_type.
-            sleep_time (int): extra time to wait, in seconds.
-        Returns:
-        """
-
-        # Wait for Lesson History Page to post.
-        if EC_type is EC.title_is:
-            WebDriverWait(my_driver, TIMEOUT).until(EC_type(location))
-        elif EC_type is EC.presence_of_element_located:
-            WebDriverWait(my_driver, TIMEOUT).until(EC_type((BY_type, location)))
-        else:
-            raise NotImplementedError(f"{str(EC_type)} is unexpected.")
-        sleep(sleep_time)
 
     def click_sleep_wait(self, xpath: str, sleep_time: int, method: str, identifier: str) -> None:
         """ Click control and wait for expected web page title to appear.
@@ -111,20 +81,17 @@ class MySelenium(object):
         Parameters:
             xpath (str):  xpath of control.
             sleep_time (int): length of time to sleep, in seconds.
-            method (str): method to wait for refresh, BY_ID, BY_PAGE_TITLE, or BY_CLASS.
-            identifier (str):
-                method = BY_PAGE_TITLE, title of web page shown after logging in.
-                method = BY_ID, HTML element ID.
-                method = BY_CLASS, HTML element class.
+            method (str): c.BY_PAGE_TITLE or a value in selenium.webdriver.common.by.By.
+            identifier (str): the identifier to search for.
         Returns:
         """
-        if method not in {BY_ID, BY_PAGE_TITLE, BY_CLASS}:
+        if method not in class_members(By) and method != BY_PAGE_TITLE:
             raise ValueError("Unknown Method.")
 
         # Click control.
         self.driver.find_element_by_xpath(xpath).click()
 
-        if sleep_time > 0:
+        if sleep_time > 5:
             stdout.write(f"Sleeping for {sleep_time} seconds.  ")
             sleep(sleep_time)  # Seconds.
 
@@ -132,9 +99,8 @@ class MySelenium(object):
         self.wait_for_refresh(method, identifier)
     # End of method click_sleep_wait.
 
-    def website_login(self, username: str, password: str, login_page_url: str,
-                      pre_login_page_title: str, post_login_page_title: str,
-                      username_field_xpath: str, password_field_xpath: str,
+    def website_login(self, username: str, password: str, login_page_url: str, pre_login_page_title: str, 
+                      post_login_page_title: str, username_field_xpath: str, password_field_xpath: str,
                       login_button_xpath: str) -> None:
         """ Login into web site.
 
@@ -170,15 +136,17 @@ class MySelenium(object):
 
         Parameters:
             web_page_url (str): URL of web page to go to.
-            method (str): method to wait for refresh, BY_ID, BY_PAGE_TITLE, or BY_CLASS.
-            identifier (str):
-                method = BY_PAGE_TITLE, title of web page shown after logging in.
-                method = BY_ID, HTML element ID.
-                method = BY_CLASS, HTML element class.
+            method (str): c.BY_PAGE_TITLE or a value in selenium.webdriver.common.by.By.
+            identifier (str): the identifier to search for.
         Returns:
         """
-        if method not in {BY_ID, BY_CLASS, BY_PAGE_TITLE}:
-            raise ValueError("Unknown Method.")
+        if method == BY_PAGE_TITLE:
+            WebDriverWait(self.driver, TIMEOUT).until(EC.title_is(identifier))
+        elif method in class_members(By):
+            print(web_page_url, method, identifier)
+            WebDriverWait(self.driver, TIMEOUT).until(EC.visibility_of_element_located((method, identifier)))
+        else:
+            raise ValueError(f"Unknown Method '{method}'.")
 
         # Go to web_page_url.
         self.driver.get(web_page_url)
@@ -187,8 +155,8 @@ class MySelenium(object):
         self.wait_for_refresh(method, identifier)
     # End of method go_to_web_page.
 
-    def get_related_by_class(self, class_name: str):
-        """ Return HTML elements with a class name.
+    def get_all_related_by_class(self, class_name: str):
+        """ Return all HTML elements with a class name.
 
         Parameters:
             class_name (str): return all HTML elements with this class name.
@@ -196,14 +164,15 @@ class MySelenium(object):
             The HTML elements with this class name.
         """
         return self.driver.find_elements_by_class_name(class_name)
+    # End of method get_all_related_by_class.
 
-    def find_elements_by_xpath(self, xpath: str):
-        """ Return HTML elements by xpath.
+    def get_one_related_by_class(self, xpath: str):
+        """ Return one HTML element by xpath.
 
         Parameters:
-            xpath (str): return all HTML elements with this class name.
+            xpath (str): return the one HTML element with this class name.
         Returns:
-            The HTML elements with this class name.
+            The HTML element with this class name.
         """
-        return self.driver.find_elements_by_xpath(xpath)
-    # End of method find_related_by_class.
+        return self.driver.find_element_by_xpath(xpath)
+    # End of method get_one_related_by_class.
