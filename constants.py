@@ -6,10 +6,21 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.3.0
+VERSION: 0.4.0
 
-DATE: May 16, 2021
+DATE: Sept 17, 2021
 """
+# from selenium.webdriver.common.by import By
+# Class By contains these members
+# CLASS_NAME = 'class name'
+# CSS_SELECTOR = 'css selector'
+# ID = 'id'
+# LINK_TEXT = 'link text'
+# NAME = 'name'
+# PARTIAL_LINK_TEXT = 'partial link text'
+# TAG_NAME = 'tag name'
+# XPATH = 'xpath'
+
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 30  # Seconds.
 

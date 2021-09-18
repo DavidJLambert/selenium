@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.3.0
+VERSION: 0.4.0
 
-DATE: May 16, 2021
+DATE: Sept 17, 2021
 """
 from selenium.webdriver.common.by import By
 import constants as c
@@ -89,7 +89,7 @@ def main():
             # xpath of button to move to next recommendation.
             xpath = '//div[@id="testimonial_nav"]/a[text()="›"]'
             xpath2 = '//span[@id="testimonial_sessions"]'
-            my_selenium.click_sleep_wait(xpath, SLEEP_TIME, c.BY_XPATH, xpath2)
+            my_selenium.click_sleep_wait(xpath, SLEEP_TIME, By.XPATH, xpath2)
 
             used_topics = set()
             # Search for topics, part 1.

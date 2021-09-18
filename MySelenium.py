@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.3.0
+VERSION: 0.4.0
 
-DATE: May 16, 2021
+DATE: Sept 17, 2021
 """
 from constants import BY_PAGE_TITLE, TIMEOUT, SELENIUM_OPTIONS
 from functions import print_stacktrace, class_members
@@ -38,7 +38,7 @@ class MySelenium(object):
         Returns:
         """
         self.options = Options()
-        self.options.headless = False
+        self.options.headless = True
         self.options.add_argument(SELENIUM_OPTIONS)
 
         self.driver = webdriver.Chrome(options=self.options,
@@ -92,7 +92,7 @@ class MySelenium(object):
         self.driver.find_element_by_xpath(xpath).click()
 
         if sleep_time > 5:
-            stdout.write(f"Sleeping for {sleep_time} seconds.  ")
+            stdout.write(f"Sleeping for {sleep_time} seconds.\n")
             sleep(sleep_time)  # Seconds.
 
         # Wait for expected page title.
@@ -140,14 +140,6 @@ class MySelenium(object):
             identifier (str): the identifier to search for.
         Returns:
         """
-        if method == BY_PAGE_TITLE:
-            WebDriverWait(self.driver, TIMEOUT).until(EC.title_is(identifier))
-        elif method in class_members(By):
-            print(web_page_url, method, identifier)
-            WebDriverWait(self.driver, TIMEOUT).until(EC.visibility_of_element_located((method, identifier)))
-        else:
-            raise ValueError(f"Unknown Method '{method}'.")
-
         # Go to web_page_url.
         self.driver.get(web_page_url)
 
@@ -166,13 +158,35 @@ class MySelenium(object):
         return self.driver.find_elements_by_class_name(class_name)
     # End of method get_all_related_by_class.
 
-    def get_one_related_by_class(self, xpath: str):
-        """ Return one HTML element by xpath.
+    def get_one_related_by_class(self, class_name: str):
+        """ Return one HTML element with a class name.
 
         Parameters:
-            xpath (str): return the one HTML element with this class name.
+            class_name (str): return the one HTML element with this class name.
         Returns:
             The HTML element with this class name.
         """
-        return self.driver.find_element_by_xpath(xpath)
+        return self.driver.find_element_by_class_name(class_name)
     # End of method get_one_related_by_class.
+
+    def find_elements_by_xpath(self, xpath: str):
+        """ Return HTML elements by xpath.
+
+        Parameters:
+            xpath (str): return all HTML elements with this xpath.
+        Returns:
+            The HTML elements with this xpath.
+        """
+        return self.driver.find_elements_by_xpath(xpath)
+    # End of method find_elements_by_xpath.
+
+    def find_element_by_xpath(self, xpath: str):
+        """ Return one HTML element by xpath.
+
+        Parameters:
+            xpath (str): return one HTML element with this xpath.
+        Returns:
+            The HTML element with this xpath.
+        """
+        return self.driver.find_element_by_xpath(xpath)
+    # End of method find_element_by_xpath.
