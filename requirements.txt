@@ -1,4 +1,1 @@
 selenium
-# Check_Chromedriver
-pytest
-varname # python-varname

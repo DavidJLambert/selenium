@@ -1,7 +1,3 @@
-import functions as f
-import constants as c
-from Jobs import Jobs
-
 from unittest import TestCase
 from varname import nameof
 
@@ -10,12 +6,12 @@ from varname import nameof
 from test.job_dict import jobs as jobs_dict
 from test.job_dict_prev import jobs_prev as jobs_prev_dict
 
-jobs = Jobs()
+jobs_curr = dict()
 for job_id, value_dict in jobs_dict.items():
     value_dict[c.JOB_ID] = job_id
     jobs.add_job(**value_dict)
 
-jobs_prev = Jobs()
+jobs_prev = dict()
 for job_id, value_dict in jobs_prev_dict.items():
     value_dict[c.JOB_ID] = job_id
     jobs_prev.add_job(**value_dict)
