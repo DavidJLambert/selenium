@@ -8,8 +8,8 @@ __pycache__/
 .idea/
 *.bak
 junk/
-test/
 debug.log
 version.txt
 error.txt
 *.csv
+/test/
