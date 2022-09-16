@@ -13,3 +13,4 @@ version.txt
 error.txt
 *.csv
 /test/
+login.py

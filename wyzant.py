@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.0
+VERSION: 0.5.1
 
-DATE: July 8, 2022
+DATE: Aug 1, 2022
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -17,11 +17,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# Web Browser dependent Selenium code
+# Web Browser dependent Selenium code.
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+# Username and password.
+import login
+
+# Other packages.
 from traceback import print_exception
 from sys import stdout, exc_info
 from copy import deepcopy
@@ -46,8 +50,8 @@ JOB_DESCRIPTION = "Description"
 CARD_NUMBER = "Card #"
 
 # Wyzant.com login information.
-USERNAME = "david.lambert.3"
-PASSWORD = "40tN7@hu^q4^8R1cw8l#"
+# USERNAME = "dummy"
+# PASSWORD = "dummy"
 
 # How to wait for refresh
 UI_PAGE_LINK = "ui-page-link"
