@@ -6,12 +6,11 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.0
+VERSION: 0.5.2
 
-DATE: July 8, 2022
+DATE: Sept 16, 2022
 """
 # Web Browser independent Selenium imports.
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,6 +21,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+# Username and password.
+from login import USERNAME, PASSWORD
+
+# Other packages.
 import csv
 from sys import stdout
 from time import sleep
@@ -31,13 +34,8 @@ from time import sleep
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 2  # Seconds.
 
-# Wyzant.com login information.
-USERNAME = "david.lambert.3"
-PASSWORD = "40tN7@hu^q4^8R1cw8l#"
-
 # How to wait for refresh
 UI_PAGE_LINK = "ui-page-link"
-
 
 topics = {'python': 'Python',
           'sql': 'SQL',
@@ -48,7 +46,6 @@ topics = {'python': 'Python',
           'linux': 'Linux', 'ubuntu': 'Linux', 'unix': 'Linux', 'bash': 'Linux',
           'code': 'Coding', 'coding': 'Coding', 'programming': 'Coding', 'loop': 'Coding'}
 exact_topics = {'GRE'}
-
 
 def main():
     """ Function main.  Get all recommendations.
@@ -112,10 +109,21 @@ def main():
             row.append(testimonial_student)
 
             # Number of sessions with student.
-            testimonial_sessions = driver.find_element(By.XPATH, '//span[@id="testimonial_sessions"]').text
-            row.append(testimonial_sessions.split()[0])
+            testimonial_sessions = driver.find_elements(By.XPATH, '//span[@id="testimonial_sessions"]')
+            if len(testimonial_sessions) > 0:
+                testimonial_sessions = testimonial_sessions[0].text
+                if len(testimonial_sessions) > 0:
+                    row.append(testimonial_sessions.split()[0])
+                else:
+                    row.append('')
+            else:
+                row.append('')
 
-            testimonial_title = driver.find_element(By.XPATH, '//h5[@id="testimonial_title"]').text
+            testimonial_titles = driver.find_elements(By.XPATH, '//h5[@id="testimonial_title"]')
+            if len(testimonial_titles) > 0:
+                testimonial_title = testimonial_titles[0].text
+            else:
+                testimonial_title = ''
 
             testimonial_body = driver.find_element(By.XPATH, '//p[@id="testimonial_body"]').text
 

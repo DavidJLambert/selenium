@@ -8,9 +8,9 @@ Using Selenium to Web Scrape wyzant.com
 
 :AUTHOR: David J. Lambert
 
-:VERSION: 0.5.0
+:VERSION: 0.5.2
 
-:DATE: July 8, 2022
+:DATE: Sept 16, 2022
 
 PROBLEM DESCRIPTION
 -------------------
@@ -45,5 +45,4 @@ PROGRAM REQUIREMENTS
 --------------------
 
 - The Python Selenium library.
-- The Selenium Chromium driver, chromedriver.exe.
 - To make the beeping sound, the Beep function in the Python Standard Library module winsound.

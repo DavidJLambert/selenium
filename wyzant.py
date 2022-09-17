@@ -6,14 +6,13 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.1
+VERSION: 0.5.2
 
-DATE: Aug 1, 2022
+DATE: Sept 16, 2022
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -23,7 +22,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Username and password.
-import login
+from login import USERNAME, PASSWORD
 
 # Other packages.
 from traceback import print_exception
@@ -32,7 +31,6 @@ from copy import deepcopy
 from winsound import Beep
 from datetime import datetime
 from time import sleep
-
 
 # CONSTANTS.
 
