@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.2
+VERSION: 0.5.3
 
-DATE: Sept 16, 2022
+DATE: March 2, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -98,7 +98,7 @@ def main():
             # Selenium options.
             stdout.write("Initializing Selenium.\n")
             options = Options()
-            options.headless = True
+            options.add_argument('--headless')
             options.add_argument("--window-size=1920,2200")
 
             # Connect to the Selenium web driver.
