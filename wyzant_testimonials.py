@@ -155,10 +155,14 @@ def main():
             # Body of testimonial.
             row.append(testimonial_body)
 
-            if previous_row == row and testimonial_student not in {'Hunter', 'Nathan'}:
-                # Repetitions means end of recommendations.
+            row_len = 0
+            for item in row:
+                row_len += len(item)
+
+            if previous_row == row and testimonial_student == 'Alex':
+                # Repetition means end of recommendations.
                 keep_going = False
-            else:
+            elif row_len > 0:
                 # Write row to file and print.
                 print(row)
                 csvwriter.writerow(row)
