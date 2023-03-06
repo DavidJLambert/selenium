@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.2
+VERSION: 0.5.3
 
-DATE: Sept 16, 2022
+DATE: Mar 5, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -47,6 +47,7 @@ topics = {'python': 'Python',
           'code': 'Coding', 'coding': 'Coding', 'programming': 'Coding', 'loop': 'Coding'}
 exact_topics = {'GRE'}
 
+
 def main():
     """ Function main.  Get all recommendations.
 
@@ -55,7 +56,7 @@ def main():
     """
     # Selenium options.
     options = Options()
-    options.headless = True
+    options.add_argument('--headless')
     options.add_argument("--window-size=1920,2200")
 
     # Connect to the Selenium web driver.
