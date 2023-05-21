@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.3
+VERSION: 0.5.4
 
-DATE: Mar 5, 2023
+DATE: May 20, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -33,9 +33,6 @@ from time import sleep
 
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 2  # Seconds.
-
-# How to wait for refresh
-UI_PAGE_LINK = "ui-page-link"
 
 topics = {'python': 'Python',
           'sql': 'SQL',
@@ -80,7 +77,7 @@ def main():
     stdout.write("Going to the Wyzant job listings page.\n")
 
     driver.get("https://www.wyzant.com/tutor/jobs")
-    WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, UI_PAGE_LINK)))
+    WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
 
     stdout.write("At Wyzant job listings page.\n")
 

@@ -1,4 +1,4 @@
-""" wyzant.py
+""" wyzant_jobs.py
 
 SUMMARY: Use Selenium to watch for new online jobs on Wyzant.com.
 
@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.3
+VERSION: 0.5.4
 
-DATE: March 2, 2023
+DATE: May 20, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -46,13 +46,6 @@ JOB_TOPIC = "Topic"
 PAY_RATE = "Rate"
 JOB_DESCRIPTION = "Description"
 CARD_NUMBER = "Card #"
-
-# Wyzant.com login information.
-# USERNAME = "dummy"
-# PASSWORD = "dummy"
-
-# How to wait for refresh
-UI_PAGE_LINK = "ui-page-link"
 
 
 def age_to_minutes(age: str) -> int:
@@ -122,21 +115,21 @@ def main():
             stdout.write("Going to the Wyzant job listings page.\n")
 
             driver.get("https://www.wyzant.com/tutor/jobs")
-            WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, UI_PAGE_LINK)))
+            WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
 
             stdout.write("At Wyzant job listings page.\n")
             stdout.write(f"Sleeping for {SLEEP_TIME} seconds.\n")
 
             driver.find_element(By.XPATH, "//label[@for='lesson_type_online']").click()
             sleep(SLEEP_TIME)  # Seconds.
-            WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, UI_PAGE_LINK)))
+            WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
 
             stdout.write("Fetched Wyzant jobs list.\n")
 
             # Loop forever.
             while True:
                 driver.refresh()
-                WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, UI_PAGE_LINK)))
+                WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
 
                 # Save jobs_curr and job_ids_curr into jobs_prev and job_ids_prev, respectively.
                 # Skip if jobs_curr empty due to faulty page load.

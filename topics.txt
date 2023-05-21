@@ -1,0 +1,62 @@
+ACT Math # subject
+ACT Science # subject 
+Algebra 1 # subject
+Algebra 2 # subject
+Calculus # subject
+Computer Programming # subject
+Computer Science # subject
+Data Science # subject
+DOS # subject
+Differential Equations # subject
+Elementary Science # subject
+Fortran # subject
+General Computer # subject
+Geometry # subject
+GRE # subject
+"GRE Math"
+GRE Prep
+GRE quantitative
+Java # subject
+Linear Algebra # subject
+Linux # subject
+awk
+Bash
+grep
+Korn
+regex
+regular expressions
+sed
+Shell
+MCSA # subject
+Microsoft Access # subject
+Microsoft Excel # subject
+Microsoft Outlook # subject
+Microsoft Powerpoint # subject
+Microsoft Windows # subject
+Microsoft Word # subject
+Physical Science # subject
+Physics # subject
+Prealgebra # subject
+Precalculus # subject
+Probability # subject
+Python # subject
+selenium
+"web scraping"
+R # subject
+SAT Math # subject
+SQL # subject
+Database
+Microsoft SQL Server
+mssql
+ms sql
+mysql
+Oracle
+postgres
+postgresql
+"SQL Server"
+sqlite
+Statistics # subject
+Trigonometry # subject
+Unix # subject
+Visual Basic # subject
+VBA
