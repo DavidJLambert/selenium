@@ -1,14 +1,14 @@
 """ wyzant_tutor_survey.py
 
-SUMMARY: Use Selenium to take a survey tutors (the competition).
+SUMMARY: Use Selenium to take a survey of tutors (the competition).
 
 REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.4
+VERSION: 0.5.5
 
-DATE: May 20, 2023
+DATE: May 21, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -109,6 +109,7 @@ def main():
             submit.click()
             sleep(SLEEP_TIME)
 
+            # Get number of tutors.
             results = driver.find_element(By.XPATH, '//div[2]/div[2]/div[1]/section/div[1]/div/h3/strong').text
             hits = results.split()[0].replace(",", "")
             row = [topic_orig, hits]
