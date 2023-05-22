@@ -14,7 +14,7 @@ DATE: May 20, 2023
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 
 # Web Browser dependent Selenium code
 from selenium.webdriver.chrome.options import Options
@@ -74,18 +74,18 @@ def main():
     stdout.write("Logging into Wyzant.\n")
     driver.get("https://www.wyzant.com/login")
 
-    WebDriverWait(driver, TIMEOUT).until(EC.title_is("Sign In | Wyzant Tutoring"))
+    WebDriverWait(driver, TIMEOUT).until(ec.title_is("Sign In | Wyzant Tutoring"))
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Username"]').send_keys(USERNAME)
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Password"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]/form/button').click()
-    WebDriverWait(driver, TIMEOUT).until(EC.title_is("My Profile | Wyzant Tutoring"))
+    WebDriverWait(driver, TIMEOUT).until(ec.title_is("My Profile | Wyzant Tutoring"))
 
     stdout.write("Done logging into Wyzant.\n")
     stdout.write("Going to the Wyzant lesson history page.\n")
 
     driver.get("https://www.wyzant.com/tutor/lessons")
     this_id = "ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"
-    WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.ID, this_id)))
+    WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, this_id)))
 
     stdout.write("At Wyzant tutoring history page.\n")
 

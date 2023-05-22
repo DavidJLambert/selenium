@@ -17,8 +17,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
+from selenium.webdriver.support import expected_conditions as ec
 
 # Web Browser dependent Selenium code
 from selenium.webdriver.chrome.options import Options
@@ -68,11 +67,11 @@ def main():
     stdout.write("Logging into Wyzant.\n")
     driver.get("https://www.wyzant.com/login")
 
-    WebDriverWait(driver, TIMEOUT).until(EC.title_is("Sign In | Wyzant Tutoring"))
+    WebDriverWait(driver, TIMEOUT).until(ec.title_is("Sign In | Wyzant Tutoring"))
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Username"]').send_keys(USERNAME)
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Password"]').send_keys(PASSWORD)
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]/form/button').click()
-    WebDriverWait(driver, TIMEOUT).until(EC.title_is("Student Dashboard | Wyzant Tutoring"))
+    WebDriverWait(driver, TIMEOUT).until(ec.title_is("Student Dashboard | Wyzant Tutoring"))
 
     stdout.write("Done logging into Wyzant.\n")
     stdout.write("Going to the Wyzant find tutors page.\n")
@@ -80,7 +79,7 @@ def main():
     driver.get("https://www.wyzant.com/match/search")
     sleep(5)
     # this_id = "ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"
-    # WebDriverWait(driver, TIMEOUT).until(EC.visibility_of_element_located((By.ID, this_id)))
+    # WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, this_id)))
 
     stdout.write("At Wyzant find tutors page.\n")
 
@@ -88,25 +87,26 @@ def main():
         csvwriter = csv.writer(output)
 
         # Heading row.
-        row = ['Topic', 'Tutors', 'Rate_Mean', 'Rating_Mean', 'Students_Mean', 'Num_Hours_Mean', 'Correl', 'Slope',
-               'Intercept', 'Entries']
+        row = ['Topic', 'Subject', 'Tutors', 'Rate_Mean', 'Rating_Mean', 'Num_Ratings_Mean', 'Topic_Hours_Mean',
+               'Total_Hours_Mean', 'Correl_Topic', 'Slope_Topic', 'Intercept_Topic', 'Correl_Total', 'Slope_Total',
+               'Intercept_Total', 'Entries']
 
         print(row)
         csvwriter.writerow(row)
 
         for topic_orig in topics:
             if " # subject" in topic_orig:
-                topic = topic_orig.split(" # subject")[0].strip()
+                topic, subject = topic_orig.split(" # ")
             else:
-                topic = topic_orig
-            # Enter subject into subject input control.
-            subject = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[2]/form/div[1]/input')
+                topic, subject = topic_orig, ""
+            # Enter search into subject input control.
+            search = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[2]/form/div[1]/input')
             sleep(SLEEP_TIME)
-            subject.send_keys(Keys.CONTROL, 'a')
+            search.send_keys(Keys.CONTROL, 'a')
             sleep(SLEEP_TIME)
-            subject.send_keys(Keys.BACKSPACE)
+            search.send_keys(Keys.BACKSPACE)
             sleep(SLEEP_TIME)
-            subject.send_keys(topic)
+            search.send_keys(topic)
             sleep(SLEEP_TIME)
 
             # Click Search "button" (an anchor).
@@ -137,9 +137,12 @@ def main():
 
             # Get tutor statistics.
             rate_list = []
+            topic_rate_list = []
+            total_rate_list = []
             rating_list = []
-            num_students_list = []
-            num_hours_list = []
+            num_ratings_list = []
+            topic_hours_list = []
+            total_hours_list = []
             entries = 0
 
             tutor_cards = driver.find_elements(By.XPATH, '//a[contains(@class, "tutor-card")]')
@@ -160,42 +163,85 @@ def main():
                     rating = float(rating[0].text.strip())
                     rating_list.append(rating)
 
-                num_students = tutor.find_elements(By.XPATH, './div/section[3]/div[1]/span[2]')
-                if not num_students:
-                    num_students_list.append(0)
+                num_ratings = tutor.find_elements(By.XPATH, './div/section[3]/div[1]/span[2]')
+                if not num_ratings:
+                    num_ratings_list.append(0)
                 else:
-                    num_students = float(num_students[0].text.strip().replace(",", "")[1:-1])
-                    num_students_list.append(num_students)
+                    num_ratings = float(num_ratings[0].text.strip().replace(",", "")[1:-1])
+                    num_ratings_list.append(num_ratings)
 
-                num_hours = tutor.find_elements(By.XPATH, './div/section[3]/div[2]/h3')
-                if not num_hours:
-                    num_hours_list.append(0)
+                '''
+                FORMAT 1:
+                TOPIC HOURS: "40 hours tutoring Fortran" at
+                    /html/body/div[2]/div[2]/div[1]/section/a[3]/div/section[3]/div[2]/div/p/span[1]
+                TOTAL HOURS: "out of 1,369 hours" at
+                    /html/body/div[2]/div[2]/div[1]/section/a[3]/div/section[3]/div[2]/div/p/span[2]
+
+                FORMAT 2:
+                TOPIC HOURS: None
+                TOTAL HOURS: "78 hours tutoring" at
+                    /html/body/div[2]/div[2]/div[1]/section/a[2]/div/section[3]/div[2]/h3
+                '''
+                topic_hours = tutor.find_elements(By.XPATH, './div/section[3]/div[2]/div/p/span[1]')
+                if topic_hours:
+                    # FORMAT 1
+                    topic_hours = float(topic_hours[0].text.split()[0].replace(",", ""))
+                    topic_hours_list.append(topic_hours)
+                    topic_rate_list.append(rate)
+
+                    total_hours = tutor.find_element(By.XPATH, './div/section[3]/div[2]/div/p/span[2]')
+                    total_hours = float(total_hours.text.split()[2].replace(",", ""))
+                    total_hours_list.append(total_hours)
+                    total_rate_list.append(rate)
                 else:
-                    num_hours = float(num_hours[0].text.split()[0].replace(",", ""))
-                    num_hours_list.append(num_hours)
+                    # FORMAT 2
+                    # No topic hours reported, so don't record topic hours.  Do get total hours.
+                    total_hours = tutor.find_elements(By.XPATH, './div/section[3]/div[2]/h3')
+                    if total_hours:
+                        total_hours = float(total_hours[0].text.split()[0].replace(",", ""))
+                        total_hours_list.append(total_hours)
+                        total_rate_list.append(rate)
+                    else:
+                        # No total hours reported, so don't record anything.
+                        pass
 
                 entries += 1
 
-            # print(rate_list)
-            # print(rating_list)
-            # print(num_students_list)
-            # print(num_hours_list)
+            if rate_list:
+                rate_mean = statistics.mean(rate_list)
+            else:
+                rate_mean = "None"
+            if rating_list:
+                rating_mean = statistics.mean(rating_list)
+            else:
+                rating_mean = "None"
+            if num_ratings_list:
+                num_ratings_mean = statistics.mean(num_ratings_list)
+            else:
+                num_ratings_mean = "None"
+            if total_hours_list:
+                total_hours_mean = statistics.mean(total_hours_list)
+            else:
+                total_hours_mean = "None"
 
-            rate_mean = statistics.mean(rate_list)
-            rating_mean = statistics.mean(rating_list)
-            num_students_mean = statistics.mean(num_students_list)
-            num_hours_mean = statistics.mean(num_hours_list)
+            if total_hours_list and total_rate_list:
+                correl_total = statistics.correlation(total_hours_list, total_rate_list)
+                slope_total, intercept_total = statistics.linear_regression(total_hours_list, total_rate_list)
 
-            # rate_median = statistics.median(rate_list)
-            # rating_median = statistics.median(rating_list)
-            # num_students_median = statistics.median(num_students_list)
-            # num_hours_median = statistics.median(num_hours_list)
+            if topic_hours_list:
+                topic_hours_mean = statistics.mean(topic_hours_list)
 
-            correl = statistics.correlation(num_hours_list, rate_list)
-            slope, intercept = statistics.linear_regression(num_hours_list, rate_list)
+                correl_topic = statistics.correlation(topic_hours_list, topic_rate_list)
+                slope_topic, intercept_topic = statistics.linear_regression(topic_hours_list, topic_rate_list)
+            else:
+                topic_hours_mean = "None"
+                correl_topic = "None"
+                slope_topic = "None"
+                intercept_topic = "None"
 
-            row = [topic_orig, number_tutors, rate_mean, rating_mean, num_students_mean, num_hours_mean, correl, slope,
-                   intercept, entries]
+            row = [topic, subject, number_tutors, rate_mean, rating_mean, num_ratings_mean, topic_hours_mean,
+                   total_hours_mean, correl_topic, slope_topic, intercept_topic, correl_total, slope_total,
+                   intercept_total, entries]
 
             print(row)
             csvwriter.writerow(row)
