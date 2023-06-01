@@ -86,7 +86,7 @@ def main():
 
     stdout.write("At Wyzant find tutors page.\n")
 
-    with open('search_topics.csv', 'w', newline='') as output:
+    with open('./output/search_topics.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.

@@ -1,6 +1,7 @@
 """ wyzant_tutor_survey.py
 
 SUMMARY: Use Selenium to take a survey of tutors (the competition).
+Abandoned in favor of writing to database in wyzant_pricing*.py.
 
 REPOSITORY: https://github.com/DavidJLambert/Selenium
 
@@ -80,7 +81,7 @@ def main():
 
     stdout.write("At Wyzant find tutors page.\n")
 
-    with open('tutor_survey.csv', 'w', newline='') as output:
+    with open('.output/tutor_survey.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.

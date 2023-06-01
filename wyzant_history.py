@@ -103,7 +103,7 @@ def main():
 
     stdout.write("In first Wyzant history page.\n")
 
-    with open(FILE_NAME + '.csv', 'w', newline='') as output:
+    with open('./output/' + FILE_NAME + '.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.
@@ -184,15 +184,17 @@ def main():
                 csvwriter.writerow(row)
 
             # xpath of ">" link to move to next page.
-            xpath = '//a[@id="ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"]'
-            next_page = driver.find_element(By.XPATH, xpath)
-            class_ = next_page.get_attribute("class").strip()
+            # xpath = '//a[@id="ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"]'
+            # next_page = driver.find_element(By.XPATH, xpath)
+            # class_ = next_page.get_attribute("class").strip()
 
-            if class_ == "":
-                next_page.click()
-                sleep(5)
-            else:
-                break
+            # if class_ == "":
+            #    next_page.click()
+            #    sleep(5)
+            # else:
+            #     break
+
+            break
 
     # Compress the output file.
     with zipfile.ZipFile(FILE_NAME + '.zip', compression=zipfile.ZIP_DEFLATED, mode='w') as x:

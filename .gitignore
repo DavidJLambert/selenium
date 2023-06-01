@@ -4,14 +4,17 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Other stuff
+# Directories
 .idea/
-*.bak
 junk/
+test/
+output/
+
+# Files
+*.bak
 debug.log
 version.txt
 error.txt
 *.csv
-/test/
 login.py
 student_login.py

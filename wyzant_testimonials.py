@@ -88,7 +88,7 @@ def main():
 
     stdout.write("In first Wyzant job listing page.\n")
 
-    with open('recommendations.csv', 'w', newline='') as output:
+    with open('.output/recommendations.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.

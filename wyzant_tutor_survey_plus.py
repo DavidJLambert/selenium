@@ -1,16 +1,18 @@
-""" wyzant_tutor_survey.py
+""" wyzant_tutor_survey_plus.py
 
 SUMMARY: Use Selenium to take a survey of tutors (the competition),
 plus a summary of the statistics of their business (how much they charge,
 number of students they've tutored, their ratings, et cetera).  Does this for tapics in a text file.
+Abandoned in favor of writing to database in wyzant_pricing*.py.
+
 
 REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.6
+VERSION: 0.5.7
 
-DATE: May 25, 2023
+DATE: May 26, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -29,14 +31,27 @@ from student_login import USERNAME, PASSWORD
 
 # Other packages.
 import csv
-from sys import stdout
 from time import sleep
 import statistics
+import datetime
 
 # CONSTANTS.
 
 TIMEOUT = 30  # Seconds.
-SLEEP_TIME = 0.2  # Seconds.
+BIG_WAIT = 2  # Seconds.
+SMALL_WAIT = 0.2  # Seconds.
+
+# Get today's date.
+current_date = datetime.date.today()
+
+
+def get_mean_sigma(input_list):
+    if len(input_list) >= 2:
+        return statistics.mean(input_list), statistics.stdev(input_list)
+    elif len(input_list) == 1:
+        return input_list[0], "None"
+    else:
+        return "None", "None"
 
 
 def main():
@@ -63,8 +78,7 @@ def main():
     # Maximize the browser window.
     driver.maximize_window()
 
-    stdout.write("Done initializing Selenium.\n")
-    stdout.write("Logging into Wyzant.\n")
+    print("Done initializing Selenium, logging into Wyzant.")
     driver.get("https://www.wyzant.com/login")
 
     WebDriverWait(driver, TIMEOUT).until(ec.title_is("Sign In | Wyzant Tutoring"))
@@ -73,55 +87,68 @@ def main():
     driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]/form/button').click()
     WebDriverWait(driver, TIMEOUT).until(ec.title_is("Student Dashboard | Wyzant Tutoring"))
 
-    stdout.write("Done logging into Wyzant.\n")
-    stdout.write("Going to the Wyzant find tutors page.\n")
+    print("Done logging into Wyzant.")
 
-    driver.get("https://www.wyzant.com/match/search")
-    sleep(5)
-    # this_id = "ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"
-    # WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, this_id)))
-
-    stdout.write("At Wyzant find tutors page.\n")
-
-    with open('tutor_survey_plus.csv', 'w', newline='') as output:
+    with open('./output/tutor_survey_plus.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.
-        row = ['Topic', 'Subject', 'Tutors', 'Num_Tutor_Cards', 'Rate_Mean', 'Rating_Mean', 'Num_Ratings_Mean', 'Topic_Hours_Mean',
-               'Total_Hours_Mean', 'Correl_Topic', 'Slope_Topic', 'Intercept_Topic', 'Correl_Total', 'Slope_Total',
-               'Intercept_Total']
+        row = ['Topic', 'Subject', 'Num_Tutors', 'Num_Tutor_Cards', 'Rate_Mean', 'Rate_Sigma',
+               'Rating_Mean', 'Rating_Sigma', 'Num_Ratings_Mean', 'Num_Ratings_Sigma', 'Years_Mean', 'Years_Sigma',
+               'Topic_Hours_Mean', 'Topic_Hours_Sigma', 'Topic_Hrs_Per_Yr_Mean', 'Topic_Hrs_Per_Yr_Sigma',
+               'Correl_Topic', 'Slope_Topic', 'Intercept_Topic',
+               'Total_Hours_Mean', 'Total_Hours_Sigma', 'Total_Hrs_Per_Yr_Mean', 'Total_Hrs_Per_Yr_Sigma',
+               'Correl_Total', 'Slope_Total', 'Intercept_Total']
 
         print(row)
         csvwriter.writerow(row)
 
         for topic_orig in topics:
+
+            # Get next topic
             if " # subject" in topic_orig:
                 topic, subject = topic_orig.split(" # ")
             else:
                 topic, subject = topic_orig, ""
-            # Enter search into subject input control.
-            search = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[2]/form/div[1]/input')
-            sleep(SLEEP_TIME)
-            search.send_keys(Keys.CONTROL, 'a')
-            sleep(SLEEP_TIME)
-            search.send_keys(Keys.BACKSPACE)
-            sleep(SLEEP_TIME)
-            search.send_keys(topic)
-            sleep(SLEEP_TIME)
+
+            driver.get("https://www.wyzant.com/match/search")
+            sleep(BIG_WAIT)
+            # this_id = "ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"
+            # WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, this_id)))
+
+            # Check the background check checkbox.
+            background_check = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[1]/form/input[6]')
+            # sleep(SMALL_WAIT)
+            if not background_check.is_selected():
+                background_check.click()
+                sleep(BIG_WAIT)
+
+            # Enter topic into subject input control.
+            search_term = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[2]/form/div[1]/input')
+            # sleep(SMALL_WAIT)
+            search_term.send_keys(Keys.CONTROL, 'a')
+            sleep(SMALL_WAIT)
+            search_term.send_keys(Keys.BACKSPACE)
+            sleep(SMALL_WAIT)
+            search_term.send_keys(topic)
+            sleep(SMALL_WAIT)
 
             # Click Search "button" (an anchor).
             submit = driver.find_element(By.XPATH, '/html/body/div[2]/section/main/aside[2]/form/div[3]/button')
-            sleep(SLEEP_TIME)
+            # sleep(SMALL_WAIT)
             submit.click()
-            sleep(SLEEP_TIME)
+            sleep(BIG_WAIT)
 
             # Get number of tutors.
             num_tutors = driver.find_elements(By.XPATH, '/html/body/div[2]/div[2]/div[1]/section/div[1]/div/h3/strong')
             if len(num_tutors) == 0:
-                row = [topic, subject, 0, 0, "None", "None", "None",
-                       "None", "None", "None", "None", "None", "None", "None", "None"]
+                row = [topic, subject, 0, 0, "None", "None", "None", "None",
+                       "None", "None", "None", "None", "None",
+                       "None", "None", "None", "None", "None"]
+
             else:
                 num_tutors = num_tutors[0].text.split()[0].replace(",", "")
+                num_tutors = int(num_tutors)
 
                 # Keep clicking "Show More Tutors" link until it disappears.
                 while True:
@@ -147,11 +174,12 @@ def main():
                 num_ratings_list = []
                 topic_hours_list = []
                 total_hours_list = []
+                tutor_url_list = []
 
                 tutor_cards = driver.find_elements(By.XPATH, '//a[contains(@class, "tutor-card")]')
                 num_tutor_cards = len(tutor_cards)
-                print("TUTOR CARDS", num_tutor_cards)
-                for tutor in tutor_cards:
+
+                for tutor_number, tutor in enumerate(tutor_cards):
                     rate = tutor.find_elements(By.XPATH, './div/section[3]/section/h5/div')
                     if not rate:
                         rate_list.append(0)
@@ -208,43 +236,73 @@ def main():
                         else:
                             # No total hours reported, so don't record anything.
                             pass
+                    tutor_url = tutor.get_attribute('href')
+                    tutor_url_list.append(tutor_url)
 
-                if rate_list:
-                    rate_mean = statistics.mean(rate_list)
-                else:
-                    rate_mean = "None"
-                if rating_list:
-                    rating_mean = statistics.mean(rating_list)
-                else:
-                    rating_mean = "None"
-                if num_ratings_list:
-                    num_ratings_mean = statistics.mean(num_ratings_list)
-                else:
-                    num_ratings_mean = "None"
-                if total_hours_list:
-                    total_hours_mean = statistics.mean(total_hours_list)
-                else:
-                    total_hours_mean = "None"
+                # END OF "for tutor in tutor_cards"
+                # Go to each tutor's web page.
+                years_list = []
+                for tutor_number, tutor_url in enumerate(tutor_url_list):
+                    print(tutor_url)
+                    driver.get(tutor_url)
+                    sleep(BIG_WAIT)
+                    check_date = driver.find_element(By.XPATH, '//a[contains(text(), "Background check passed")]')
+                    check_date = check_date.find_element(By.XPATH, '..').text
+                    check_date = check_date.strip().split()[-1]
+                    month, day, year = check_date.split('/')
+                    check_date = datetime.date(int(year), int(month), int(day))
+                    age = current_date - check_date
+                    years = age.days/365.2425
+                    years_list.append(years)
 
-                if total_hours_list and total_rate_list:
-                    correl_total = statistics.correlation(total_hours_list, total_rate_list)
-                    slope_total, intercept_total = statistics.linear_regression(total_hours_list, total_rate_list)
+                rate_mean, rate_sigma = get_mean_sigma(rate_list)
 
-                if topic_hours_list:
-                    topic_hours_mean = statistics.mean(topic_hours_list)
+                rating_mean, rating_sigma = get_mean_sigma(rating_list)
 
-                    correl_topic = statistics.correlation(topic_hours_list, topic_rate_list)
-                    slope_topic, intercept_topic = statistics.linear_regression(topic_hours_list, topic_rate_list)
+                num_ratings_mean, num_ratings_sigma = get_mean_sigma(num_ratings_list)
+
+                total_hours_mean, total_hours_sigma = get_mean_sigma(total_hours_list)
+
+                topic_hours_mean, topic_hours_sigma = get_mean_sigma(topic_hours_list)
+
+                years_mean, years_sigma = get_mean_sigma(years_list)
+
+                if total_hours_list and years_list:
+                    total_hrs_per_yr_list = [h/y for h, y in zip(total_hours_list, years_list)]
                 else:
-                    topic_hours_mean = "None"
+                    total_hrs_per_yr_list = []
+
+                total_hrs_per_yr_mean, total_hrs_per_yr_sigma = get_mean_sigma(total_hrs_per_yr_list)
+
+                if topic_hours_list and years_list:
+                    topic_hrs_per_yr_list = [h/y for h, y in zip(topic_hours_list, years_list)]
+                else:
+                    topic_hrs_per_yr_list = []
+
+                topic_hrs_per_yr_mean, topic_hrs_per_yr_sigma = get_mean_sigma(topic_hrs_per_yr_list)
+
+                if len(total_hrs_per_yr_list) >= 2 and len(total_rate_list) >= 2:
+                    correl_total = statistics.correlation(total_hrs_per_yr_list, total_rate_list)
+                    slope_total, intercept_total = statistics.linear_regression(total_hrs_per_yr_list, total_rate_list)
+                else:
+                    correl_total = "None"
+                    slope_total = "None"
+                    intercept_total = "None"
+
+                if len(topic_hrs_per_yr_list) >= 2 and len(topic_rate_list) >= 2:
+                    correl_topic = statistics.correlation(topic_hrs_per_yr_list, topic_rate_list)
+                    slope_topic, intercept_topic = statistics.linear_regression(topic_hrs_per_yr_list, topic_rate_list)
+                else:
                     correl_topic = "None"
                     slope_topic = "None"
                     intercept_topic = "None"
 
-                row = [topic, subject, num_tutors, num_tutor_cards, rate_mean, rating_mean, num_ratings_mean,
-                       topic_hours_mean, total_hours_mean, correl_topic, slope_topic, intercept_topic, correl_total,
-                       slope_total, intercept_total]
-
+                row = [topic, subject, num_tutors, num_tutor_cards, rate_mean, rate_sigma,
+                       rating_mean, rating_sigma, num_ratings_mean, num_ratings_sigma, years_mean, years_sigma,
+                       topic_hours_mean, topic_hours_sigma, topic_hrs_per_yr_mean, topic_hrs_per_yr_sigma,
+                       correl_topic, slope_topic, intercept_topic,
+                       total_hours_mean, total_hours_sigma, total_hrs_per_yr_mean, total_hrs_per_yr_sigma,
+                       correl_total, slope_total, intercept_total]
             print(row)
             csvwriter.writerow(row)
 
