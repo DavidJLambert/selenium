@@ -1,11 +1,11 @@
-""" wyzant_pricing_gender.py
+""" pricing_gender.py
 
 SUMMARY: Part 3 of a survey and analysis of tutors (the competition).
 Fixes issues with highest_degree and gender from Parts 1 and 2.
 
-Part 1 wyzant_pricing.py.
+Part 1: wyzant_pricing.py.
 Part 2: wyzant_pricing_detail.py
-Part 3: wyzant_pricing_gender.py
+Part 3: pricing_gender.py
 
 REPOSITORY: https://github.com/DavidJLambert/Selenium
 

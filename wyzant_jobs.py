@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.4
+VERSION: 0.5.7
 
-DATE: May 20, 2023
+DATE: Aug 25, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -21,15 +21,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-# Username and password.
-from login import USERNAME, PASSWORD
+from wyzant_login import log_into_wyzant
 
 # Other packages.
 from traceback import print_exception
 from sys import stdout, exc_info
 from copy import deepcopy
 from winsound import Beep
-from datetime import datetime
+from datetime import datetime, date
 from time import sleep
 
 # CONSTANTS.
@@ -48,25 +47,33 @@ JOB_DESCRIPTION = "Description"
 CARD_NUMBER = "Card #"
 
 
-def age_to_minutes(age: str) -> int:
+def age_to_minutes(arg: str) -> int:
     """ Convert job age to minutes.
 
     Parameters:
-        age (str): age of job, in units of minutes, hours, or days.
+        arg (str): either age of job, in units of minutes, hours, or days,
+                   or date (format "mmm d") job was submitted.
     Returns:
         length (int): age of job in minutes.
     """
-    units = age[-1]
-    length = int(age[:-1])
-    if units == 'm':
-        pass
-    elif units == 'h':
-        length = 60 * length
-    elif units == 'd':
-        length = 60 * 24 * length
+    if arg[-1].isdigit():
+        # age contains date
+        now = date.today()
+        submitted = datetime.strptime(arg, "%b %d").date()
+        delta = now - submitted
+        length = 60 * 24 * delta.days
     else:
-        # Ages greater than 7 days formatted as "mmm d"
-        length = 60 * 24 * 7
+        units = arg[-1]
+        length = int(arg[:-1])
+        if units == 'm':
+            pass
+        elif units == 'h':
+            length = 60 * length
+        elif units == 'd':
+            length = 60 * 24 * length
+        else:
+            print("UNKNOWN ELAPSED TIME UNITS")
+            length = 0
     return length
 # End of function age_to_minutes.
 
@@ -102,16 +109,10 @@ def main():
             driver.maximize_window()
 
             stdout.write("Done initializing Selenium.\n")
-            stdout.write("Logging into Wyzant.\n")
 
-            driver.get("https://www.wyzant.com/login")
-            WebDriverWait(driver, TIMEOUT).until(ec.title_is("Sign In | Wyzant Tutoring"))
-            driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Username"]').send_keys(USERNAME)
-            driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Password"]').send_keys(PASSWORD)
-            driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]/form/button').click()
-            WebDriverWait(driver, TIMEOUT).until(ec.title_is("My Profile | Wyzant Tutoring"))
+            # Log into wyzant.
+            driver = log_into_wyzant(driver)
 
-            stdout.write("Done logging into Wyzant.\n")
             stdout.write("Going to the Wyzant job listings page.\n")
 
             driver.get("https://www.wyzant.com/tutor/jobs")

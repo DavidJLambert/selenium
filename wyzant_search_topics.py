@@ -1,4 +1,4 @@
-""" wyzant_tutor_survey.py
+""" wyzant_search_topics.py
 
 SUMMARY: Use Selenium to find my ranking among the tutors for each topic listed in a text file.
 
@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.5
+VERSION: 0.5.7
 
-DATE: May 25, 2023
+DATE: Aug 25, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -22,14 +22,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-# Username and password.
-from student_login import USERNAME, PASSWORD
+from wyzant_login import log_into_wyzant
 
 # Other packages.
 import csv
 from sys import stdout
 from time import sleep
-import statistics
 
 # CONSTANTS.
 
@@ -67,16 +65,10 @@ def main():
     driver.maximize_window()
 
     stdout.write("Done initializing Selenium.\n")
-    stdout.write("Logging into Wyzant.\n")
-    driver.get("https://www.wyzant.com/login")
 
-    WebDriverWait(driver, TIMEOUT).until(ec.title_is("Sign In | Wyzant Tutoring"))
-    driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Username"]').send_keys(USERNAME)
-    driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]//input[@id="Password"]').send_keys(PASSWORD)
-    driver.find_element(By.XPATH, '//*[@id="sso_login-landing"]/form/button').click()
-    WebDriverWait(driver, TIMEOUT).until(ec.title_is("Student Dashboard | Wyzant Tutoring"))
+    # Log into wyzant.
+    driver = log_into_wyzant(driver)
 
-    stdout.write("Done logging into Wyzant.\n")
     stdout.write("Going to the Wyzant find tutors page.\n")
 
     driver.get("https://www.wyzant.com/match/search")

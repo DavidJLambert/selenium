@@ -16,5 +16,4 @@ debug.log
 version.txt
 error.txt
 *.csv
-login.py
-student_login.py
+login_*.py
