@@ -13,13 +13,14 @@ AUTHOR: David J. Lambert
 
 VERSION: 0.6.0
 
-DATE: May 31, 2023
+DATE: Sep 02, 2023
 """
 import sqlite3
 import gender_guesser.detector as gender_guesser
 
 # CONSTANTS.
 DB_PATH = r'C:\Users\david\Desktop\Wyzant\Pricing\Pricing.sqlite3'
+TIMEOUT = 10
 
 # Instantiate gender guesser
 """ Output:
@@ -52,7 +53,7 @@ def main():
     Returns:
     """
     # Connect to database.
-    connection = sqlite3.connect(database=DB_PATH, timeout=10)
+    connection = sqlite3.connect(database=DB_PATH, timeout=TIMEOUT)
     cursor = connection.cursor()
 
     # Find tutors who need details from their profile added.

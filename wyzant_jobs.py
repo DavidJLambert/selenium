@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -25,7 +25,7 @@ from wyzant_login import log_into_wyzant
 
 # Other packages.
 from traceback import print_exception
-from sys import stdout, exc_info
+from sys import exc_info
 from copy import deepcopy
 from winsound import Beep
 from datetime import datetime, date
@@ -35,6 +35,7 @@ from time import sleep
 
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 30  # Seconds.
+MY_CLASS_NAME = "ui-page-link"
 
 # Keys for the jobs_curr and jobs_prev dictionaries.
 JOB_ID = "Job ID"
@@ -96,7 +97,7 @@ def main():
             job_ids_prev = set()
 
             # Selenium options.
-            stdout.write("Initializing Selenium.\n")
+            print("Initializing Selenium.")
             options = Options()
             options.add_argument('--headless')
             options.add_argument("--window-size=1920,2200")
@@ -108,29 +109,29 @@ def main():
             # Maximize the browser window.
             driver.maximize_window()
 
-            stdout.write("Done initializing Selenium.\n")
+            print("Done initializing Selenium.")
 
             # Log into wyzant.
             driver = log_into_wyzant(driver)
 
-            stdout.write("Going to the Wyzant job listings page.\n")
+            print("Going to the Wyzant job listings page.")
 
             driver.get("https://www.wyzant.com/tutor/jobs")
-            WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
+            WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, MY_CLASS_NAME)))
 
-            stdout.write("At Wyzant job listings page.\n")
-            stdout.write(f"Sleeping for {SLEEP_TIME} seconds.\n")
+            print("At Wyzant job listings page.")
+            print(f"Sleeping for {SLEEP_TIME} seconds.")
 
             driver.find_element(By.XPATH, "//label[@for='lesson_type_online']").click()
-            sleep(SLEEP_TIME)  # Seconds.
-            WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
+            # sleep(SLEEP_TIME)  # Seconds.
+            WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, MY_CLASS_NAME)))
 
-            stdout.write("Fetched Wyzant jobs list.\n")
+            print("Fetched Wyzant jobs list.")
 
             # Loop forever.
             while True:
                 driver.refresh()
-                WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
+                WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, MY_CLASS_NAME)))
 
                 # Save jobs_curr and job_ids_curr into jobs_prev and job_ids_prev, respectively.
                 # Skip if jobs_curr empty due to faulty page load.
@@ -140,9 +141,9 @@ def main():
                     jobs_curr.clear()
                     job_ids_curr.clear()
 
-                # Print and write to log file the current datetime.
+                # Print the current datetime.
                 date_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                stdout.write(date_time + "  ")
+                print(date_time + "    ", end="")
 
                 # Each instance of class "academy-card" contains 1 job, 10 cards per page.
                 academy_cards = driver.find_elements(By.CLASS_NAME, "academy-card")
@@ -203,22 +204,22 @@ def main():
 
                     # Print progress, on just one line.
                     if card_num == 0:
-                        stdout.write(f"Done fetching job {card_num}")
+                        print(f"Done fetching job {card_num}", end="")
                     else:
-                        stdout.write(f", {card_num}")
+                        print(f", {card_num}", end="")
                 # Done iterating over academy_cards.
 
-                # After stdout.write, need to add newline.
-                stdout.write("\n")
+                # After print, need to add newline.
+                print()
 
                 # Look for new jobs: the job IDs in job_ids and not in job_ids_prev.
                 current_num = len(jobs_curr)
                 previous_num = len(jobs_prev)
                 # Skip if job_ids or job_ids_prev has too few entries (1st loop or faulty page load).
                 if current_num == 0:
-                    stdout.write(f"Current  # Job IDs: {current_num}.\n")
+                    print(f"Current  # Job IDs: {current_num}.")
                 elif previous_num == 0:
-                    stdout.write(f"Previous # Job IDs: {previous_num}.\n")
+                    print(f"Previous # Job IDs: {previous_num}.")
                 else:
                     new_job_ids = job_ids_curr.difference(job_ids_prev)
 
@@ -226,17 +227,17 @@ def main():
                     for job_id in new_job_ids:
                         age = jobs_curr[job_id][JOB_AGE]
                         if age <= 10:
-                            job_summary = f"New job at www.wyzant.com/tutor/jobs/{job_id}\n"
+                            job_summary = f"New job at www.wyzant.com/tutor/jobs/{job_id}"
 
                             for key in jobs_curr[job_id].keys():
                                 value = jobs_curr[job_id][key]
-                                job_summary += f"('{job_id}', '{key}'): '{value}'\n"
+                                job_summary += f"('{job_id}', '{key}'): '{value}'"
 
                             # Make audible tone.
                             Beep(6000, 1000)
 
                             # Print the job summary.
-                            stdout.write(job_summary)
+                            print(job_summary)
                     # Done iterating over new_job_ids.
 
                 # Wait some more, so that jobs page polled about every 30 seconds.
@@ -244,8 +245,7 @@ def main():
             # End of inner while loop.
         except Exception:
             # Print exception.
-            print_exception(*exc_info(), limit=None, file=stdout)
-            # Close log file.
+            print_exception(*exc_info(), limit=None)
             # Make audible tone.
             Beep(1000, 1000)
             # Wait, in case of a web glitch.

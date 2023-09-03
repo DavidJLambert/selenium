@@ -13,9 +13,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -67,7 +67,7 @@ guess_dict = {'unknown': 'Unk',
 
 
 # Get the current time, in 'YYYY-MM-DD HH:MM:SS' format.
-def get_date_time():
+def get_date_time() -> str:
     return str(datetime.datetime.now())[:19]
 
 
@@ -102,7 +102,7 @@ def main():
     driver = log_into_wyzant(driver)
 
     # Connect to database.
-    connection = sqlite3.connect(database=DB_PATH, timeout=10)
+    connection = sqlite3.connect(database=DB_PATH, timeout=TIMEOUT)
     cursor = connection.cursor()
     print("Connected to SQLite.")
 
@@ -159,7 +159,7 @@ def main():
                 break
             except Exception:
                 print(f"{topic} TOPIC SEARCH RAISED THIS EXCEPTION, TRY #{num_tries}:")
-                print_exception(*exc_info(), limit=None, file=stdout)
+                print_exception(*exc_info(), limit=None)
                 sleep(FAILURE_WAIT)
 
         else:  # for num_tries in range(1, MAX_TRIES):
@@ -201,7 +201,7 @@ def main():
                 break
             except Exception:
                 print(f"{topic} TUTOR-CARD SEARCH RAISED THIS EXCEPTION, TRY #{num_tries}:")
-                print_exception(*exc_info(), limit=None, file=stdout)
+                print_exception(*exc_info(), limit=None)
                 sleep(FAILURE_WAIT)
         else:  # for num_tries in range(1, MAX_TRIES):
             print(f"{topic} GETTING LIST OF TUTOR-CARDS FAILED {MAX_TRIES} TIMES, SKIPPING TO NEXT TOPIC.")
@@ -291,7 +291,7 @@ def main():
                     break
                 except Exception:
                     print(f"{topic} GET INTO FOR TUTOR {id_number} RAISED THIS EXCEPTION, TRY #{num_tries}:")
-                    print_exception(*exc_info(), limit=None, file=stdout)
+                    print_exception(*exc_info(), limit=None)
                     sleep(FAILURE_WAIT)
 
             else:  # for num_tries in range(1, MAX_TRIES):

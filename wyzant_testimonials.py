@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.6
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -25,13 +25,10 @@ from wyzant_login import log_into_wyzant
 
 # Other packages.
 import csv
-from sys import stdout
-from time import sleep
 
 # CONSTANTS.
 
 TIMEOUT = 30  # Seconds.
-SLEEP_TIME = 2  # Seconds.
 
 topics = {'python': 'Python',
           'sql': 'SQL',
@@ -62,37 +59,37 @@ def main():
     # Maximize the browser window.
     driver.maximize_window()
 
-    stdout.write("Done initializing Selenium.\n")
+    print("Done initializing Selenium.")
 
     # Log into wyzant.
     driver = log_into_wyzant(driver)
 
-    stdout.write("Going to the Wyzant job listings page.\n")
+    print("Going to the Wyzant job listings page.")
 
     driver.get("https://www.wyzant.com/tutor/jobs")
     WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
 
-    stdout.write("At Wyzant job listings page.\n")
+    print("At Wyzant job listings page.")
 
     # Go inside first job listing page.
     control = driver.find_elements(By.XPATH, '//a[@class="job-details-link"]')[0]
     control.click()
-    sleep(SLEEP_TIME)
+    WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, "testimonial_student_name")))
 
-    stdout.write("In first Wyzant job listing page.\n")
+    print("In first Wyzant job listing page.")
 
     with open('./output/recommendations.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
 
         # Heading row.
         row = ['Name', 'Sessions', 'Topics', 'Title', 'Body']
-        print(row)
         csvwriter.writerow(row)
+        row = '\t'.join(row)
+        print(row)
 
         # Loop over recommendations.
         keep_going = True
         while keep_going:
-            previous_row = row
             row = []
 
             # Student name.
@@ -119,9 +116,14 @@ def main():
             testimonial_body = driver.find_element(By.XPATH, '//p[@id="testimonial_body"]').text
 
             # xpath of button to move to next recommendation.
-            xpath2 = '//span[@id="testimonial_sessions"]'
-            driver.find_element(By.XPATH, '//div[@id="testimonial_nav"]/a[text()="›"]').click()
-            sleep(SLEEP_TIME)
+            # driver.find_element(By.XPATH, '//div[@id="testimonial_nav"]/a[text()="›"]').click()
+            arrows = driver.find_elements(By.XPATH, '//a[text()="›"][not(contains(@class, "disabled"))]')
+            if len(arrows) == 1:
+                arrows[0].click()
+            else:
+                keep_going = False
+
+            WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, "testimonial_student_name")))
 
             used_topics = set()
             # Search for topics, part 1.
@@ -150,13 +152,11 @@ def main():
             for item in row:
                 row_len += len(item)
 
-            if previous_row == row and testimonial_student == 'Alex':
-                # Repetition means end of recommendations.
-                keep_going = False
-            elif row_len > 0:
+            if row_len > 0:
                 # Write row to file and print.
-                print(row)
                 csvwriter.writerow(row)
+                row = '\t'.join(row)
+                print(row)
 
 # End of function main.
 

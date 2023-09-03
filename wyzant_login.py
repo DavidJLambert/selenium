@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 from selenium import webdriver
 from selenium.webdriver.common.by import By

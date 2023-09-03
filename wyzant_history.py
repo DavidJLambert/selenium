@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -34,9 +34,11 @@ import zipfile
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 2  # Seconds.
 FILE_NAME = './output/history'
+CSV = 'csv'
+TSV = 'tsv'
 
 
-def time_fmt(convert_me):
+def time_fmt(convert_me: str) -> str:
     hh_mm, am_pm = convert_me.split(" ")
     hh, mm = hh_mm.split(":")
     if am_pm == "AM":
@@ -61,13 +63,13 @@ def main():
         fmt = input("Enter 'c' for csv output, or 't' or press 'Enter' for tab-separated value output: ")
         extension = fmt.lower()
         if extension == 'c':
-            extension = 'csv'
+            extension = CSV
             delimiter = ','
         elif extension in ['t', '']:
-            extension = 'tsv'
+            extension = TSV
             delimiter = '\t'
 
-        if extension in ['csv', 'tsv']:
+        if extension in [CSV, TSV]:
             print(f"You chose {extension} format.")
             break
         else:
@@ -118,7 +120,7 @@ def main():
         # Heading row.
         row = ['Date', 'Time', 'Min', 'Hrs', 'Entered', 'Online', 'Student', 'Subject', 'Rating',
                'Rate', 'Pay', 'Earned', 'Miles', 'Payment', 'Status']
-        if extension == 'csv':
+        if extension == CSV:
             print(row)
         else:
             print(delimiter.join(row))
@@ -195,7 +197,7 @@ def main():
                 row.append(value)
 
                 # Save row.
-                if extension == 'csv':
+                if extension == CSV:
                     print(row)
                 else:
                     print(delimiter.join(row))

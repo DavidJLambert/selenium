@@ -12,9 +12,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -33,7 +33,7 @@ from wyzant_login import log_into_wyzant
 import datetime
 import sqlite3
 from traceback import print_exception
-from sys import stdout, exc_info
+from sys import exc_info
 
 # CONSTANTS.
 
@@ -46,7 +46,7 @@ MAX_TRIES = 6
 
 
 # Get the current time, in 'YYYY-MM-DD HH:MM:SS' format.
-def get_date_time():
+def get_date_time() -> str:
     return str(datetime.datetime.now())[:19]
 
 
@@ -175,7 +175,7 @@ def main():
         except Exception:
             # print stack trace, but continue on to next record.
             print(f"Exception caught scraping {tutor_url}:")
-            print_exception(*exc_info(), limit=None, file=stdout)
+            print_exception(*exc_info(), limit=None)
 
     else:
         pass

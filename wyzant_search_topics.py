@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.5.7
+VERSION: 0.6.0
 
-DATE: Aug 25, 2023
+DATE: Sep 02, 2023
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -26,7 +26,6 @@ from wyzant_login import log_into_wyzant
 
 # Other packages.
 import csv
-from sys import stdout
 from time import sleep
 
 # CONSTANTS.
@@ -64,19 +63,19 @@ def main():
     # Maximize the browser window.
     driver.maximize_window()
 
-    stdout.write("Done initializing Selenium.\n")
+    print("Done initializing Selenium.")
 
     # Log into wyzant.
     driver = log_into_wyzant(driver)
 
-    stdout.write("Going to the Wyzant find tutors page.\n")
+    print("Going to the Wyzant find tutors page.")
 
     driver.get("https://www.wyzant.com/match/search")
     sleep(5)
     # this_id = "ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"
     # WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.ID, this_id)))
 
-    stdout.write("At Wyzant find tutors page.\n")
+    print("At Wyzant find tutors page.")
 
     with open('./output/search_topics.csv', 'w', newline='') as output:
         csvwriter = csv.writer(output)
