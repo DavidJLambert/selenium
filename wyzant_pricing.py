@@ -66,8 +66,12 @@ guess_dict = {'unknown': 'Unk',
               'mostly_female': 'F?'}
 
 
-# Get the current time, in 'YYYY-MM-DD HH:MM:SS' format.
 def get_date_time() -> str:
+    """ Function get_date_time.
+
+    Parameters:
+    Returns: Current date-time as string in 'YYYY-MM-DD HH:MM:SS' format.
+    """
     return str(datetime.datetime.now())[:19]
 
 

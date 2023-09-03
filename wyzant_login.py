@@ -22,6 +22,11 @@ TIMEOUT = 30  # Seconds.
 
 
 def log_into_wyzant(driver):
+    """ Function log_into_wyzant.
+
+    Parameters: Selenium driver object, before logging into Wyzant.
+    Returns: Selenium driver object, after logging into Wyzant.
+    """
 
     print("Logging into Wyzant.")
     driver.get("https://www.wyzant.com/login")

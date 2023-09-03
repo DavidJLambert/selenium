@@ -10,6 +10,8 @@ VERSION: 0.6.0
 
 DATE: Sep 02, 2023
 """
+import time
+
 # Web Browser independent Selenium imports.
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -25,31 +27,29 @@ from wyzant_login import log_into_wyzant
 
 # Other packages.
 import csv
-from time import sleep
+from time import sleep, strptime, strftime
 from os import remove
 import zipfile
 
 # CONSTANTS.
 
 TIMEOUT = 30  # Seconds.
-SLEEP_TIME = 2  # Seconds.
+SHORT_SLEEP_TIME = 2  # Seconds.
+LONG_SLEEP_TIME = 5  # Seconds.
 FILE_NAME = './output/history'
 CSV = 'csv'
 TSV = 'tsv'
 
 
 def time_fmt(convert_me: str) -> str:
-    hh_mm, am_pm = convert_me.split(" ")
-    hh, mm = hh_mm.split(":")
-    if am_pm == "AM":
-        if hh == "12":
-            hh = "00"
-        elif len(hh) == 1:
-            hh = "0" + hh
-    else:
-        if hh != "12":
-            hh = str(int(hh) + 12)
-    return hh + ":" + mm
+    """ Function time_fmt.
+
+    Parameters: Time of day using AM/PM.
+    Returns: Time of day in HH:MM format, with HH = 01-23.
+    """
+    time_obj = strptime(convert_me, "%I:%M %p")
+    output = strftime("%H:%M", time_obj)
+    return output
 
 
 def main():
@@ -102,15 +102,15 @@ def main():
 
     # Click the "Show All" link.
     show_all = driver.find_element(By.ID, value='ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_btnShowAll')
-    sleep(SLEEP_TIME)
+    sleep(SHORT_SLEEP_TIME)
     show_all.click()
-    sleep(SLEEP_TIME)
+    sleep(SHORT_SLEEP_TIME)
 
     # Select 200 entries per page.
     this_id = 'ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_DDPageSize'
     per_page = Select(driver.find_element(By.ID, value=this_id))
     per_page.select_by_value("200")
-    sleep(5)
+    sleep(LONG_SLEEP_TIME)
 
     print("In first Wyzant history page.")
 
@@ -210,7 +210,7 @@ def main():
 
             # if class_ == "":
             #    next_page.click()
-            #    sleep(5)
+            #    sleep(LONG_SLEEP_TIME)
             # else:
             #     break
 

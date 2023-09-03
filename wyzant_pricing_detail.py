@@ -45,8 +45,12 @@ DB_PATH = r'C:\Users\david\Desktop\Wyzant\Pricing\Pricing.sqlite3'
 MAX_TRIES = 6
 
 
-# Get the current time, in 'YYYY-MM-DD HH:MM:SS' format.
 def get_date_time() -> str:
+    """ Function get_date_time.
+
+    Parameters:
+    Returns: Current date-time as string in 'YYYY-MM-DD HH:MM:SS' format.
+    """
     return str(datetime.datetime.now())[:19]
 
 
@@ -190,102 +194,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-'''
-# Go to each tutor's web page.
-for tutor_detail in tutor_detail_list:
-    tutor_url, topic, subject = tutor_detail
-
-    # Tutor ID number
-    id_number = tutor_url.split("?")[0].split("/")[-1]
-    id_number = int(id_number)
-
-    # Go to URL.
-    driver.get(tutor_url)
-    xpath = '/html/body/footer/div[1]/div[2]/div/div[1]/ul/li[1]/a'
-    WebDriverWait(driver, TIMEOUT, poll_frequency=0.2).until(ec.element_to_be_clickable((By.XPATH,
-                                                                                         xpath)))
-
-    # Response time.
-    xpath = '/html/body/div[2]/section/div[1]/div[1]/section/div[6]/div'
-    response_time = driver.find_elements(By.XPATH, xpath)
-    if response_time:
-        response_time, units = response_time[0].text.strip().split()[2:]
-        response_time = int(response_time)
-        if units[:4] == "hour":
-            response_time *= 60
-        elif units[:6] == "minute":
-            pass
-        else:
-            response_time = None
-    else:
-        response_time = None
-
-    # Background check date.
-    xpath = ('/html/body/div/section/div/div/div/div/ul/li/p/a[contains(text(), '
-             '"Background check passed")]/..')
-    check_date = driver.find_elements(By.XPATH, xpath)
-    if check_date:
-        check_date = check_date[0].text.strip().split()[-1]
-        month, day, year = check_date.split('/')
-        check_date = datetime.date(int(year), int(month), int(day))
-    else:
-        check_date = None
-
-    # Highest degree.
-    highest_degree = 'None'
-    xpath = '/html/body/div/section/div/div/div/h3[contains(text(), "Education")]/../div/section'
-    degrees = driver.find_elements(By.XPATH, xpath)
-    if len(degrees) > 0:
-        for degree in degrees:
-            degree = degree.text.split("\n")
-            if len(degree) >= 2:
-                degree = degree[1]
-                if highest_degree in ['MS', 'BS', 'None'] and degree == 'PhD':
-                    highest_degree = 'PhD'
-                elif highest_degree in ['BS', 'None'] and degree in ['Masters', 'MBA']:
-                    highest_degree = 'MS'
-                elif highest_degree == 'None':
-                    highest_degree = 'BS'
-
-    # Examples of Expertise.
-    examples = driver.find_elements(By.XPATH,
-                                    '/html/body/div[2]/section/div[1]/div[3]/div[6]/div[3]/div[1]/a')
-    examples = len(examples)
-
-    # City and state.
-    location = driver.find_elements(By.XPATH, '/html/body/div[2]/section/div[1]/div[3]/aside/h2')
-    if location:
-        location = location[0].text[6:-7]
-        city, state = location.split(", ")
-    else:
-        city, state = None, None
-
-    # Insert into or Update Tutors.
-    sql = f"SELECT COUNT(*) FROM Tutors WHERE ID = ?"
-    cursor.execute(sql, [id_number])
-    count = cursor.fetchone()[0]
-
-    if count == 0:
-        print("WTF 1")
-    else:
-        sql = ("UPDATE Tutors SET City = ?, State = ?, Response_Time_Min = ?, Highest_Degree = ?, "
-               "Last_Update = ? WHERE ID = ?")
-    cursor.execute(sql, [city, state, response_time, highest_degree, get_date_time(), id_number])
-
-    # Insert into or Update Topics.
-    sql = f"SELECT COUNT(*) FROM Topics WHERE ID = ? AND Topic = ?"
-    cursor.execute(sql, [id_number, topic])
-    count = cursor.fetchone()[0]
-
-    if count == 0:
-        print("WTF 2")
-    else:
-        sql = "UPDATE Topics SET Examples_Expertise = ?, Last_Update = ? WHERE ID = ? AND Topic = ?"
-    cursor.execute(sql, [examples, get_date_time(), id_number, topic])
-
-    connection.commit()
-# END OF "for tutor_detail in tutor_detail_list"
-print(f"{topic} FINISHED TUTOR WEB PAGES")
-'''
