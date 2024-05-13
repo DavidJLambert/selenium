@@ -1,16 +1,26 @@
 """ wyzant_history.py
 
-SUMMARY: Use Selenium to get my entire tutoring history.
+SUMMARY:
+    Use Selenium to get my entire tutoring history and:
+    1.  Write it to a csv or tsv (tab-separated-values) file.
+    2.  Print it in the same format.
+    Have disabled (but not removed) ability to scrape multiple pages to get the
+    entire tutoring history, since I already have the entire tutoring history
+    in an Excel workbook, and update only the last 3 or so months of the
+    tutoring history.
 
-REPOSITORY: https://github.com/DavidJLambert/Selenium
+REPOSITORY:
+    https://github.com/DavidJLambert/wyzant
 
-AUTHOR: David J. Lambert
+AUTHOR:
+    David J. Lambert
 
-VERSION: 0.6.0
+VERSION:
+    0.6.1
 
-DATE: Sep 02, 2023
+DATE:
+    May 12, 2024
 """
-import time
 
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -27,9 +37,9 @@ from wyzant_login import log_into_wyzant
 
 # Other packages.
 import csv
+import os
 from time import sleep, strptime, strftime
-from os import remove
-import zipfile
+# import zipfile
 
 # CONSTANTS.
 
@@ -59,6 +69,7 @@ def main():
     Returns:
     """
     # Get output format.
+    delimiter = '\t'
     while True:
         fmt = input("Enter 'c' for csv output, or 't' or press 'Enter' for tab-separated value output: ")
         extension = fmt.lower()
@@ -173,7 +184,7 @@ def main():
                     value = t_cells[6].find_elements(By.XPATH, xpath)
                     value = str(len(value))
                 else:
-                    value = "None"
+                    value = ""
                 row.append(value)
                 # Cell  8 "Rate", $/hr
                 value = t_cells[7].text.strip()[1:-3]
@@ -190,11 +201,18 @@ def main():
                     value = value[:-6]
                 row.append(value)
                 # Cell 12 "Payment" date
-                value = t_cells[11].find_element(By.XPATH, './a/span/span[1]').text.strip()
-                row.append(value)
-                # Cell 13 "Status", "complete" or "void"
-                value = t_cells[12].find_element(By.XPATH, './a').text.strip()
-                row.append(value)
+                values = t_cells[11].find_elements(By.XPATH, './a/span/span[1]')
+                if len(values) > 0:
+                    # Payment date present.
+                    value = values[0]
+                    row.append(value.text.strip())
+                    # Cell 13 "Status", "complete" or "void"
+                    value = t_cells[12].find_element(By.XPATH, './a').text.strip()
+                    row.append(value)
+                else:
+                    # No payment date present, so leave date blank and set status = void
+                    row.append("void")
+                    row.append("void")
 
                 # Save row.
                 if extension == CSV:
@@ -204,24 +222,25 @@ def main():
                 csvwriter.writerow(row)
 
             # xpath of ">" link to move to next page.
-            # xpath = '//a[@id="ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"]'
-            # next_page = driver.find_element(By.XPATH, xpath)
-            # class_ = next_page.get_attribute("class").strip()
+            xpath = '//a[@id="ctl00_ctl00_PageCPH_CenterColumnCPH_LessonDisplay1_ListViewSession_Pager_NextPageBTN"]'
+            next_page = driver.find_element(By.XPATH, xpath)
+            href = next_page.get_attribute("href").strip()
 
-            # if class_ == "":
-            #    next_page.click()
-            #    sleep(LONG_SLEEP_TIME)
-            # else:
-            #     break
+            if href != "":
+                next_page.click()
+                sleep(LONG_SLEEP_TIME)
+            else:
+                break
 
+            # Comment out to allow multiple loops.
             break
 
-    # Compress the output file.
-    with zipfile.ZipFile(FILE_NAME + '.zip', compression=zipfile.ZIP_DEFLATED, mode='w') as x:
-        x.write(FILE_NAME + extension, compresslevel=9)
+    ## Compress the output file.
+    # with zipfile.ZipFile(FILE_NAME + '.zip', compression=zipfile.ZIP_DEFLATED, mode='w') as x:
+    #    x.write(FILE_NAME + extension, compresslevel=9)
 
-    # Delete csv file.
-    remove(FILE_NAME + extension)
+    # Delete csv file, not using file output currently.
+    os.remove(FILE_NAME + extension)
 # End of function main.
 
 

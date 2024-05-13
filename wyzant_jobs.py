@@ -198,6 +198,10 @@ def main():
                         # Done iterating over all job attributes in class "spc_zero".
 
                     # Save job properties in new entry in dict jobs_curr, and save job_id in set job_ids_curr.
+                    # for key, value in params.items():
+                    #     print("params", key, value)
+                    # Description?
+                    # Availability?
                     job_id = params[JOB_ID]
                     jobs_curr[job_id] = params
                     job_ids_curr.add(job_id)
@@ -227,11 +231,30 @@ def main():
                     for job_id in new_job_ids:
                         age = jobs_curr[job_id][JOB_AGE]
                         if age <= 10:
+                            keys = jobs_curr[job_id].keys()
+
                             job_summary = f"New job at www.wyzant.com/tutor/jobs/{job_id}"
 
-                            for key in jobs_curr[job_id].keys():
+                            key = 'Rate'
+                            if key in keys:
                                 value = jobs_curr[job_id][key]
-                                job_summary += f"('{job_id}', '{key}'): '{value}'"
+                                job_summary += f'\n{key.upper()}: "{value}"'
+                            key = 'Topic'
+                            if key in keys:
+                                value = jobs_curr[job_id][key]
+                                job_summary += f'\n{key.upper()}: "{value}"'
+                            key = 'Subject'
+                            if key in keys:
+                                value = jobs_curr[job_id][key]
+                                job_summary += f'\n{key.upper()}: "{value}"'
+                            key = 'Student grade level'
+                            if key in keys:
+                                value = jobs_curr[job_id][key]
+                                job_summary += f'\n{key.upper()}: "{value}"'
+                            key = 'Description'
+                            if key in keys:
+                                value = jobs_curr[job_id][key]
+                                job_summary += f'\n{key.upper()}: "{value}"'
 
                             # Make audible tone.
                             Beep(6000, 1000)
