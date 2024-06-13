@@ -6,9 +6,9 @@ REPOSITORY: https://github.com/DavidJLambert/Selenium
 
 AUTHOR: David J. Lambert
 
-VERSION: 0.6.0
+VERSION: 0.6.1
 
-DATE: Sep 02, 2023
+DATE: Jun 13, 2024
 """
 # Web Browser independent Selenium imports.
 from selenium import webdriver
@@ -67,7 +67,9 @@ def main():
     print("Going to the Wyzant job listings page.")
 
     driver.get("https://www.wyzant.com/tutor/jobs")
-    WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "ui-page-link")))
+    # View page source
+    # print(driver.page_source)
+    WebDriverWait(driver, TIMEOUT).until(ec.visibility_of_element_located((By.CLASS_NAME, "job-details-link")))
 
     print("At Wyzant job listings page.")
 
