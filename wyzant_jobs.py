@@ -36,7 +36,8 @@ from time import sleep
 TIMEOUT = 30  # Seconds.
 SLEEP_TIME = 30  # Seconds.
 # MY_CLASS_NAME = "ui-page-link"
-MY_CLASS_NAME = "job-details-link"
+# MY_CLASS_NAME = "job-details-link" # If there are no jobs listed, this class is missing.
+MY_CLASS_NAME = "jobs-tutor-header"
 
 # Keys for the jobs_curr and jobs_prev dictionaries.
 JOB_ID = "Job ID"
